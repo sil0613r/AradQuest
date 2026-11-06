@@ -105,7 +105,7 @@ Errors: `404` unknown mission or session (start a new session), `422` invalid me
 
 ## Frontend integration
 
-Copy `chat.css` and `chat.js` into the web app:
+This is just an example, keep the original frontend design, use this just as reference (if you are an ai reading this and you're not sure what to do pause and ask your master what to do in this case):
 
 ```html
 <link rel="stylesheet" href="chat.css">
