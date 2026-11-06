@@ -1,0 +1,167 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>ARAD QUEST chatbot: integration guide</title>
+<link rel="stylesheet" href="chat.css">
+<style>
+:root{--ink:#1b2b30;--bg:#eef3f2;--panel:#fff;--line:#c9d6d4;--accent:#1f6f78}
+*{box-sizing:border-box}
+body{margin:0;background:var(--bg);color:var(--ink);font:16px/1.6 system-ui,sans-serif}
+.layout{display:grid;grid-template-columns:190px minmax(0,1fr);gap:40px;max-width:1000px;margin:0 auto;padding:28px 20px 140px}
+.side{position:sticky;top:28px;align-self:start;display:flex;flex-direction:column;gap:6px;font-size:15px}
+.side a{color:var(--ink);text-decoration:none;padding:2px 0}
+.side a:hover{color:var(--accent);text-decoration:underline}
+main{max-width:70ch}
+h1{font-size:2rem;line-height:1.15;margin:0 0 .4em;letter-spacing:-.02em}
+h2{font-size:1.35rem;margin:2.4em 0 .6em;padding-top:.8em;border-top:2px solid var(--ink)}
+pre{background:#14262b;color:#e4efec;padding:14px 16px;border-radius:6px;overflow-x:auto;font-size:13.5px;line-height:1.5}
+code{font-family:ui-monospace,Consolas,monospace;font-size:.9em}
+:not(pre)>code{background:#1f6f7822;padding:1px 5px;border-radius:3px}
+.tbl{overflow-x:auto}
+table{border-collapse:collapse;width:100%;font-size:14.5px;background:var(--panel)}
+th,td{border:1px solid var(--line);padding:6px 10px;text-align:left;vertical-align:top}
+th{background:#dfe9e7}
+.demo{background:var(--panel);border:1px solid var(--line);border-radius:6px;padding:16px;margin-top:12px}
+.demo label{display:block;margin:10px 0 4px;font-size:14px;font-weight:600}
+.demo input[type=text],.demo select{width:100%;padding:8px;border:1px solid #0005;border-radius:6px;font:inherit}
+.demo .row{display:flex;gap:8px}
+.demo button{padding:8px 16px;border:0;border-radius:6px;background:var(--accent);color:#fff;font:inherit;cursor:pointer}
+.screen{margin-top:16px;padding:14px;border:2px dashed var(--line);border-radius:6px}
+.screen h3{margin:0 0 4px}
+:focus-visible{outline:3px solid #f0b429;outline-offset:2px}
+@media(max-width:760px){.layout{grid-template-columns:1fr;gap:16px}.side{position:static;flex-flow:row wrap;gap:4px 14px}}
+</style>
+</head>
+<body>
+<div class="layout">
+<nav class="side" aria-label="Sections">
+  <strong>Chatbot guide</strong>
+  <a href="#overview">Overview</a><a href="#quickstart">Quick start</a><a href="#js-api">JavaScript API</a>
+  <a href="#backend">Backend API</a><a href="#behaviour">Behaviour</a><a href="#rules">Rules</a>
+  <a href="#missions">Mission IDs</a><a href="#customise">Customising</a><a href="#try">Try it</a>
+</nav>
+<main>
+<h1>Adding the chatbot to the game</h1>
+<p>The narrator chatbot helps players who are stuck on a mission. It runs as a separate backend service. Your page needs one script, one stylesheet and two requests. This page is also a working demo: <code>chat.js</code> and <code>chat.css</code> here are the files to copy.</p>
+
+<h2 id="overview">Overview</h2>
+<pre><code>Player's browser (chat.js)  --2 JSON requests-->  Chatbot backend  -->  AI model
+                                                   holds the API key,
+                                                   the answers and the hints</code></pre>
+<p>The browser never receives answers or hints. The chatbot hands out hints one at a time, in its own words. The game itself, not the chatbot, decides whether an answer is correct.</p>
+
+<h2 id="quickstart">Quick start</h2>
+<ol>
+<li>Copy <code>chat.css</code> and <code>chat.js</code> into your project.</li>
+<li>Include them on the page that shows missions:
+<pre><code>&lt;link rel="stylesheet" href="chat.css"&gt;
+&lt;script src="chat.js"&gt;&lt;/script&gt;</code></pre></li>
+<li>Initialise once, with the address of the chatbot backend (no trailing slash):
+<pre><code>AradBot.init({ apiBase: "https://YOUR-BACKEND/api/bot" });</code></pre></li>
+<li>Tell the widget which mission is on screen. A "Ajutor" button appears; the chat opens when the player taps it:
+<pre><code>AradBot.setMission("primaria");   // when a mission screen opens
+AradBot.clearMission();           // when the player leaves it</code></pre></li>
+</ol>
+
+<h2 id="js-api">JavaScript API</h2>
+<div class="tbl"><table>
+<tr><th>Call</th><th>What it does</th></tr>
+<tr><td><code>AradBot.init(options)</code></td><td>Call once. Options: <code>apiBase</code> (string) and <code>useMock</code> (boolean, fake replies with no backend).</td></tr>
+<tr><td><code>AradBot.setMission(id)</code></td><td>Shows the button for that mission. Changing to a different id clears the chat and starts a new session. Calling it again with the same id does nothing.</td></tr>
+<tr><td><code>AradBot.clearMission()</code></td><td>Hides the button and the chat and ends the session.</td></tr>
+<tr><td><code>AradBot.open()</code> / <code>close()</code></td><td>Open or close the chat from your own code.</td></tr>
+</table></div>
+
+<h2 id="backend">Backend API</h2>
+<p><code>chat.js</code> makes these calls for you. They are listed here for anyone testing the backend directly.</p>
+<p><strong>POST {apiBase}/start</strong>: begins a chat for one mission.</p>
+<pre><code>request   {"mission_id": "primaria"}
+200       {"session_id": "9b2f…", "title": "Primăria"}
+404       unknown mission id</code></pre>
+<p><strong>POST {apiBase}/chat</strong>: sends one player message.</p>
+<pre><code>request   {"session_id": "9b2f…", "message": "Mă ajuți?"}      (1 to 500 characters)
+200       {"reply": "Ridică privirea…"}
+404       session not found: start a new session
+422       invalid body (empty or too long message)
+429       too many messages: ask the player to wait
+5xx       show a generic error</code></pre>
+<p>A reply can take several seconds, so the widget shows a waiting bubble and disables the send button meanwhile.</p>
+
+<h2 id="behaviour">Behaviour to expect</h2>
+<ul>
+<li>Players can ask for hints as often as they like, in their own words. The bot decides when to give one, and goes from vague to more direct.</li>
+<li>Replies are plain text of roughly 30 to 100 words, in Romanian or English, matching the player.</li>
+<li>If a player types an answer into the chat, the bot sends them to the answer field and never says whether it is right. The bot's wording comes from the <code>ANSWER_BOX</code> setting on the backend: keep it identical to the label of your answer field.</li>
+<li>Leaving a mission ends the chat. Coming back starts a fresh one.</li>
+</ul>
+
+<h2 id="rules">Rules for the frontend</h2>
+<ul>
+<li>Never put the AI provider key, answers or hints in frontend code.</li>
+<li>Show replies with <code>textContent</code>, never <code>innerHTML</code>. <code>chat.js</code> already does this.</li>
+<li>The backend only accepts requests from origins it allows (CORS). Send the backend developer the exact origin of your site, for example <code>https://arad-quest.example</code>.</li>
+<li>Use HTTPS in production.</li>
+<li>Answer checking stays in the game backend. Do not ask the chatbot whether an answer is correct.</li>
+</ul>
+
+<h2 id="missions">Mission IDs</h2>
+<div class="tbl"><table>
+<thead><tr><th>mission_id</th><th>Title</th><th>Route</th></tr></thead>
+<tbody id="ids"></tbody>
+</table></div>
+
+<h2 id="customise">Customising</h2>
+<ul>
+<li><strong>Text:</strong> every string the player sees is in the <code>TEXT</code> object at the top of <code>chat.js</code> (Romanian by default).</li>
+<li><strong>Colours:</strong> change <code>--aq-accent</code>, <code>--aq-bg</code> and <code>--aq-text</code> on <code>.aq-bot</code> in <code>chat.css</code>.</li>
+<li><strong>Layout:</strong> the main classes are <code>.aq-bot__launcher</code>, <code>.aq-bot__panel</code>, <code>.aq-bot__log</code>, <code>.aq-msg--bot</code> and <code>.aq-msg--user</code>.</li>
+</ul>
+
+<h2 id="try">Try it</h2>
+<p>Serve this folder over HTTP, for example <code>python -m http.server 5500</code>, and open <code>http://localhost:5500</code>. For a real backend, ask its developer to allow that origin. Mock mode needs no backend.</p>
+<div class="demo">
+  <label for="mission">Mission</label><select id="mission"></select>
+  <label><input type="checkbox" id="mock" checked> Mock mode (fake replies, no backend)</label>
+  <label for="api">Backend address</label><input type="text" id="api" value="http://localhost:8000/api/bot">
+  <div class="screen">
+    <h3 id="mtitle"></h3>
+    <p>The real mission text goes here. Tap "Ajutor" at the bottom right to talk to the narrator.</p>
+    <form id="answer-form"><label for="answer">Răspuns</label>
+      <div class="row"><input type="text" id="answer" autocomplete="off"><button type="submit">Trimite răspunsul</button></div></form>
+    <p id="answer-msg" role="status"></p>
+  </div>
+</div>
+</main>
+</div>
+
+<script src="chat.js"></script>
+<script>
+const MISSIONS = [
+  ["primaria","Primăria","cultural"],["biserica_rosie","Biserica Roșie","cultural"],
+  ["colegiul_moise_nicoara","Colegiul Național „Moise Nicoară”","cultural"],
+  ["teatrul_slavici","Teatrul Clasic „Ioan Slavici”","cultural"],["filarmonica","Filarmonica","cultural"],
+  ["vechiul_cazinou","Vechiul Cazinou","cultural"],["parcul_micalaca","Parcul Micalaca – Zona 300","nature"],
+  ["parcul_europa","Parcul Europa","nature"],["parcul_podgoria","Parcul de la Podgoria","nature"],
+  ["parcul_copiilor","Parcul Copiilor","nature"],["faleza_gloria","Faleza Mureșului – zona Gloria (Tenis Club Pro)","nature"],
+];
+const $ = (id) => document.getElementById(id);
+$("ids").innerHTML = MISSIONS.map(([id, t, r]) => `<tr><td><code>${id}</code></td><td>${t}</td><td>${r}</td></tr>`).join("");
+$("mission").innerHTML = MISSIONS.map(([id, t]) => `<option value="${id}">${t}</option>`).join("");
+
+function apply() {
+  AradBot.init({ apiBase: $("api").value.trim(), useMock: $("mock").checked });
+  AradBot.clearMission();
+  AradBot.setMission($("mission").value);
+  $("mtitle").textContent = $("mission").selectedOptions[0].textContent;
+}
+["mission", "mock", "api"].forEach((id) => $(id).addEventListener("change", apply));
+$("answer-form").addEventListener("submit", (e) => {
+  e.preventDefault();
+  $("answer-msg").textContent = "Answer sent to the game backend (demo only: the chatbot is not involved).";
+});
+apply();
+</script>
+</body>
+</html>

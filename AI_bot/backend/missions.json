@@ -1,0 +1,168 @@
+{
+  "primaria": {
+    "route": "cultural",
+    "title": "Primăria",
+    "description": "Este kilometrul zero al deciziilor locale, o clădire administrativă care te privește de sus printr-un turn cu ceas. Deasupra intrării principale stă scris un citat celebru. Cărei evanghelii îi aparține?",
+    "answer": "Ioan",
+    "also_block": [
+      "John"
+    ],
+    "clues": [
+      "Ridică privirea: deasupra intrării principale, cuvintele nu sunt scrise în limba pe care o vorbești, ci într-una veche.",
+      "Sunt trei cuvinte scurte. Caută-le sensul, chiar și cu ajutorul telefonului.",
+      "Citatul vine din Noul Testament și este rostit de Isus, nu de un om obișnuit.",
+      "Noul Testament începe cu patru evanghelii. Citatul nu se află în cele după Matei, Marcu sau Luca."
+    ]
+  },
+  "biserica_rosie": {
+    "route": "cultural",
+    "title": "Biserica Roșie",
+    "description": "O clădire impunătoare de pe bulevardul principal, imposibil de ratat datorită stilului neogotic. Nu e făcută din foc, dar îi poartă culoarea. Nu te mulțumi să o privești din față. Clădirea își dezvăluie secretele și celor care o înconjoară. Fă un tur complet și numără toate porțile integrate în zidurile exterioare. Câte ai descoperit?",
+    "answer": "5",
+    "also_block": [
+      "cinci",
+      "five"
+    ],
+    "clues": [
+      "Biserica nu se lasă înțeleasă dintr-un singur loc. Fă înconjurul complet, fără grabă.",
+      "Urmărește zidul exterior pe toate laturile: porțile care te interesează sunt cele integrate în el.",
+      "Numără doar porțile care fac parte din zidul exterior.",
+      "Alege o poartă ca punct de plecare, mergi într-o singură direcție și oprește-te când ajungi din nou la ea. Așa nu numeri nimic de două ori."
+    ]
+  },
+  "colegiul_moise_nicoara": {
+    "route": "cultural",
+    "title": "Colegiul Național „Moise Nicoară”",
+    "description": "În fața unei școli cu o istorie aparte, două siluete de bronz stau de strajă, câte una de fiecare parte a intrării. În apropiere, terenul de sport amintește că educația nu se desfășoară doar între ziduri. Care număr leagă matematic destinele celor doi paznici?",
+    "answer": "77",
+    "also_block": [
+      "saptezeci si sapte",
+      "seventy-seven",
+      "seventy seven"
+    ],
+    "clues": [
+      "Cei doi paznici de bronz nu sunt simplu decor: fiecare a avut o viață, iar viețile lor se leagă printr-un număr.",
+      "Caută pe statui sau pe socluri anii înscriși: sunt vizibili.",
+      "Nu te interesează anii în sine, ci ce se află între ei: calculează cât a trăit fiecare.",
+      "Compară rezultatele pentru cei doi bărbați. Numărul căutat este cel pe care îl au în comun."
+    ]
+  },
+  "teatrul_slavici": {
+    "route": "cultural",
+    "title": "Teatrul Clasic „Ioan Slavici”",
+    "description": "Clădirea cu coloane masive albe, locul din centrul orașului unde drama și comedia își dau întâlnire seară de seară. Nu toți cei care au trecut pragul acestui loc au venit să joace. Unul a locuit aici, dar scena lui a fost poezia. Caută-i urma pe zid și descoperă-i identitatea. Câte silabe conține cuvântul ce formează județul în care acesta s-a născut?",
+    "answer": "2",
+    "also_block": [],
+    "clues": [
+      "Nu toți cei care au trecut pragul acestui loc au fost actori. Caută pe zidul clădirii o plăcuță: ea păstrează urma unui locatar.",
+      "Locatarul a fost poet. Citește cu atenție numele de pe plăcuță: odată ce îl ai, poți afla unde s-a născut.",
+      "Răspunsul nu este un an și nici o dată, ci un număr de silabe. Află în ce județ s-a născut poetul și ia în calcul doar numele județului.",
+      "Poetul se numește Aron Cotruș. Află județul în care s-a născut și desparte în silabe numele lui, fără cuvântul „județul”."
+    ]
+  },
+  "filarmonica": {
+    "route": "cultural",
+    "title": "Filarmonica",
+    "description": "Locul unde istoria și muzica împart același acoperiș. Caută palatul de lângă parc din care, dacă asculți cu atenție, poți auzi acorduri de vioară. Uită-te în jurul clădirii. Nu este nici drum, nici călător, dar stă pe cinci linii paralele și stabilește regulile de la bun început. Se înfășoară exact pe a doua linie. Cum se numește?",
+    "answer": "cheia sol",
+    "also_block": [
+      "cheie sol",
+      "cheia de sol",
+      "cheia violinei",
+      "treble clef",
+      "g clef"
+    ],
+    "clues": [
+      "Nu te uita doar la clădire: privește și iarba de lângă ea. Nu tot ce crește acolo a apărut întâmplător.",
+      "Florile din iarbă desenează un simbol muzical.",
+      "Simbolul stă la începutul portativului și se înfășoară în jurul celei de-a doua linii; el hotărăște ce notă se află pe linia aceea.",
+      "Numele lui are două cuvinte: primul este ceea ce folosești ca să descui o ușă, al doilea este numele unei note muzicale."
+    ]
+  },
+  "vechiul_cazinou": {
+    "route": "cultural",
+    "title": "Vechiul Cazinou",
+    "description": "Timp de aproape două secole, clădirea a fost martora vieții orașului. A cunoscut strălucirea, apoi uitarea, iar pereții săi au îndurat focul și timpul. Astăzi, și-a recăpătat grandoarea pe faleza râului, pregătită să găzduiască din nou evenimentele Aradului. Trei repere au fost lăsate în urmă de timp și sunt scrise într-un alfabet în care semnele se adună pentru a deveni numere. Privește-le în ordinea coborârii, nu în ordinea anilor. Unul dintre ele marchează începutul acestei clădiri. Nu te întreb ce an este, ci unde se află în șirul celor trei.",
+    "answer": "3",
+    "also_block": [],
+    "clues": [
+      "Nu toate urmele timpului sunt în interior: caută scara care coboară, în lateralul clădirii.",
+      "Pe scară vei găsi trei date, scrise cu cifre romane.",
+      "Citește-le în ordinea în care le întâlnești când cobori, nu în ordinea anilor.",
+      "Una dintre cele trei date marchează începutul clădirii. Nu îți cer anul, ci locul ei în șir: prima, a doua sau a treia pe care o întâlnești?"
+    ]
+  },
+  "parcul_micalaca": {
+    "route": "nature",
+    "title": "Parcul Micalaca – Zona 300",
+    "description": "La marginea cartierului Micalaca, acolo unde orașul se apropie de faleza Mureșului, se întinde un spațiu verde dedicat relaxării și mișcării. Aleile, terenurile de sport și locurile de joacă adună aici oameni de toate vârstele. Este un loc în care natura și comunitatea se întâlnesc. Nu doar plimbările și sportul te așteaptă aici. Parcul a fost amenajat și pentru cei care preferă să petreacă timp în aer liber, la un grătar cu prietenii. Câte locuri pentru grătar au fost prevăzute în parc?",
+    "answer": "10",
+    "also_block": [
+      "zece",
+      "ten"
+    ],
+    "clues": [
+      "Parcul e mai mult decât alei și terenuri de sport: parcurge-l cu atenție, nu doar zona prin care intri.",
+      "Caută locurile amenajate pentru grătar, făcute pentru cei care vin la un picnic cu prietenii.",
+      "Răspunsul se află chiar în fața ochilor tăi: privește în jur și numără cu răbdare.",
+      "Numără de două ori, în sensuri diferite, și compară rezultatele."
+    ]
+  },
+  "parcul_europa": {
+    "route": "nature",
+    "title": "Parcul Europa",
+    "description": "Un colț de verdeață în care numele unui întreg continent a devenit simbolul relaxării. Aproape de malul Mureșului, parcul oferă un refugiu departe de agitația orașului. Printre alei și spații de odihnă, mici construcții colorate îi așteaptă pe cei care au nevoie de un adăpost. Natura nu ține întotdeauna cont de planurile noastre, iar uneori ploaia ne poate surprinde în mijlocul unei plimbări. Câte căsuțe colorate găsești aici, pregătite să te adăpostească?",
+    "answer": "3",
+    "also_block": [],
+    "clues": [
+      "Plimbă-te prin tot parcul, nu doar pe aleea principală.",
+      "Caută construcții mici și colorate, făcute ca să te ferească de ploaie.",
+      "Răspunsul se află chiar în fața ochilor tăi: privește în jur și numără cu răbdare.",
+      "Numără de două ori și compară rezultatele. Dacă diferă, mai caută o dată prin colțurile parcului."
+    ]
+  },
+  "parcul_podgoria": {
+    "route": "nature",
+    "title": "Parcul de la Podgoria",
+    "description": "În apropierea lacului de la Podgoria, natura creează un decor liniștit, în care apa, vegetația și aleile par să invite la o pauză. Un bust veghează asupra parcului, păstrând vie amintirea unei personalități importante din istoria României. Privește cu atenție și descoperă cine este. Printre copaci și în apropierea apei, o statuie păstrează amintirea unui om care a marcat istoria recentă a României. Care este numele personalității reprezentate?",
+    "answer": "Coposu",
+    "also_block": [
+      "Corneliu"
+    ],
+    "clues": [
+      "Caută bustul din parc, aproape de lac, și apropie-te de el.",
+      "Citește cu atenție ce scrie pe soclu sau pe plăcuță: acolo se află numele personalității.",
+      "A fost un om politic care a petrecut mulți ani în închisorile comuniste și a devenit, după 1989, liderul unui partid istoric.",
+      "Este unul dintre cei mai respectați oameni politici ai României de după 1989 și a murit în 1995."
+    ]
+  },
+  "parcul_copiilor": {
+    "route": "nature",
+    "title": "Parcul Copiilor",
+    "description": "Un loc în care joaca, natura și imaginația se întâlnesc. Printre copaci, alei și spații de joacă, cei mici își găsesc mereu o nouă aventură. Dar nu toate drumurile sunt simple: uneori, pentru a ajunge la destinație, trebuie să găsești calea potrivită. Există un loc în care te poți rătăci printre drumuri întortocheate, dar unde răbdarea și atenția te ajută să găsești ieșirea. Cum se numește?",
+    "answer": "labirint",
+    "also_block": [
+      "labyrinth",
+      "maze"
+    ],
+    "clues": [
+      "Nu toate distracțiile din parc sunt făcute pentru alergat: unele te provoacă să te pierzi.",
+      "Caută un loc unde ai de ales între mai multe drumuri, iar unele nu duc nicăieri.",
+      "Răbdarea și atenția sunt singurele tale unelte: dacă o iei pe un drum greșit, trebuie să te întorci.",
+      "Un loc ca acesta, cu drumuri încâlcite din care e greu să ieși, a fost construit, după legendă, în Creta, ca să închidă un monstru pe jumătate om, pe jumătate taur."
+    ]
+  },
+  "faleza_gloria": {
+    "route": "nature",
+    "title": "Faleza Mureșului – zona Gloria (Tenis Club Pro)",
+    "description": "De-a lungul Mureșului, faleza oferă un spațiu potrivit pentru mișcare și recreere. În zona Gloria, printre copaci și alei, sportul își găsește locul pe terenurile de tenis. Aici, fiecare schimb de mingi cere atenție, precizie și puțină strategie. Nu departe de faleză, fileul împarte terenul în două, iar mingea trece dintr-o parte în alta. Privește cu atenție terenurile de la Tenis Club Pro. Câte terenuri de tenis sunt aici?",
+    "answer": "4",
+    "also_block": [],
+    "clues": [
+      "Mergi spre zona Gloria și caută terenurile de tenis de la Tenis Club Pro.",
+      "Numără terenurile, unul câte unul, nu jucătorii și nu mingile.",
+      "Răspunsul se află chiar în fața ochilor tăi: privește în jur și numără cu răbdare.",
+      "Numără de două ori și compară rezultatele. Dacă diferă, mai caută o dată în jurul zonei."
+    ]
+  }
+}
