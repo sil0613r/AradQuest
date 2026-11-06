@@ -18,9 +18,9 @@ CREATE TABLE jucatori (
     username VARCHAR(50) NOT NULL UNIQUE,
     email VARCHAR(100) NOT NULL UNIQUE,
     password_hash TEXT NOT NULL,
-    class_id INTEGER REFERENCES clase_jucatori(class_id),
     total_points INTEGER DEFAULT 0 CHECK (total_points >= 0),
-    created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
+    created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+    avatar_id INTEGER NOT NULL CHECK (avatar_id BETWEEN 1 AND 4)
 );
 
 -- 3. Obiective turistice
@@ -31,7 +31,7 @@ CREATE TABLE obiective_turistice (
     address TEXT,
     image_url TEXT,
     location GEOGRAPHY(POINT, 4326) NOT NULL,
-    radius_meters INTEGER DEFAULT 30,
+    radius_meters INTEGER NOT NULL DEFAULT 50,
     is_active BOOLEAN DEFAULT TRUE
 );
 
