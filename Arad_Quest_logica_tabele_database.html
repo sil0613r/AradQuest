@@ -2,115 +2,753 @@
 <html lang="ro">
 <head>
 <meta charset="UTF-8">
-<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<meta name="viewport" content="width=device-width, initial-scale=1">
 <title>Arad Quest – Harta bazei de date</title>
+
 <style>
-:root{--ink:#172033;--muted:#586579;--line:#d8dfeb;--blue:#2457a7;--pale:#eef4ff;--teal:#087e78;--tealp:#e9f7f5;--gold:#95620a;--goldp:#fff7e5;--bg:#f4f6fa}
-*{box-sizing:border-box}body{margin:0;background:var(--bg);color:var(--ink);font:15px/1.5 Arial,Helvetica,sans-serif}
-.sheet{width:min(1100px,calc(100% - 32px));margin:28px auto;background:white;padding:42px 48px;box-shadow:0 8px 28px #17203314;border-radius:14px}
-h1{font-size:30px;margin:0 0 8px}h2{font-size:23px;margin:0 0 18px}h3{font-size:17px;margin:22px 0 8px;color:var(--blue)}p{margin:7px 0;color:var(--muted)}.eyebrow{color:var(--teal);font-weight:bold;text-transform:uppercase;letter-spacing:1.5px;font-size:12px}.subtitle{font-size:16px;max-width:780px}.legend{display:flex;gap:18px;flex-wrap:wrap;margin:22px 0 12px;font-size:13px}.legend span{display:flex;align-items:center;gap:7px}.dot{width:11px;height:11px;border-radius:3px;display:inline-block}.pk{background:var(--blue)}.fk{background:var(--teal)}.composite{background:#c28b22}
-.diagram{border:1px solid var(--line);border-radius:12px;padding:12px;background:#fbfcff;overflow:auto}.diagram svg{display:block;width:100%;min-width:820px;height:auto}.note{background:var(--pale);border-left:4px solid var(--blue);padding:12px 15px;border-radius:6px;margin-top:18px;color:#34445e}.small{font-size:12px;color:var(--muted)}
-table{width:100%;border-collapse:collapse;margin:10px 0 18px;font-size:13px}th,td{text-align:left;padding:9px 10px;border-bottom:1px solid var(--line);vertical-align:top}th{background:#f1f5fb;color:#293c5c}code{font-family:Consolas,monospace;background:#f1f4f8;padding:2px 5px;border-radius:4px;color:#253d68}.group{margin:20px 0}.pill{display:inline-block;border-radius:20px;padding:2px 8px;font-size:11px;font-weight:bold}.pill.pk{color:white}.pill.fk{color:white}.pill.cp{background:var(--goldp);color:var(--gold)}.footer{border-top:1px solid var(--line);padding-top:12px;margin-top:26px;font-size:12px;color:var(--muted)}
-@media print{body{background:white}.sheet{width:100%;margin:0;padding:14mm;box-shadow:none;border-radius:0;min-height:277mm}.page-two{break-before:page;page-break-before:always}.diagram{break-inside:avoid}a{color:inherit}}
-@media(max-width:650px){.sheet{padding:24px 18px;margin:12px auto}h1{font-size:25px}}
+:root {
+  --ink: #17243b;
+  --muted: #5c6b80;
+  --line: #dbe3ee;
+  --blue: #2457a7;
+  --bluebg: #edf3ff;
+  --teal: #087e78;
+  --tealbg: #eaf7f5;
+  --gold: #98670d;
+  --goldbg: #fff6df;
+  --purple: #6b4bb5;
+  --purplebg: #f3efff;
+  --bg: #f3f6fb;
+}
+
+* {
+  box-sizing: border-box;
+}
+
+body {
+  margin: 0;
+  background: var(--bg);
+  color: var(--ink);
+  font: 15px/1.55 Arial, sans-serif;
+}
+
+.wrap {
+  max-width: 1180px;
+  margin: 28px auto;
+  padding: 0 18px;
+}
+
+.sheet {
+  background: white;
+  border: 1px solid var(--line);
+  border-radius: 18px;
+  padding: 38px 42px;
+  margin-bottom: 24px;
+  box-shadow: 0 8px 28px #1d35570c;
+}
+
+.eyebrow {
+  font-size: 11px;
+  font-weight: 800;
+  letter-spacing: 1.6px;
+  text-transform: uppercase;
+  color: var(--teal);
+}
+
+h1 {
+  font-size: 32px;
+  line-height: 1.15;
+  margin: 8px 0;
+}
+
+h2 {
+  font-size: 23px;
+  margin: 0 0 16px;
+}
+
+h3 {
+  font-size: 17px;
+  margin: 24px 0 9px;
+  color: var(--blue);
+}
+
+p {
+  color: var(--muted);
+  margin: 7px 0;
+}
+
+.lead {
+  font-size: 16px;
+  max-width: 900px;
+}
+
+.stats {
+  display: grid;
+  grid-template-columns: repeat(4, 1fr);
+  gap: 12px;
+  margin: 22px 0;
+}
+
+.stat {
+  background: #f7f9fc;
+  border: 1px solid var(--line);
+  border-radius: 12px;
+  padding: 15px;
+}
+
+.stat strong {
+  display: block;
+  font-size: 25px;
+  color: var(--blue);
+}
+
+.stat span {
+  font-size: 12px;
+  color: var(--muted);
+}
+
+.legend {
+  display: flex;
+  gap: 16px;
+  flex-wrap: wrap;
+  margin: 18px 0;
+}
+
+.legend span {
+  display: flex;
+  align-items: center;
+  gap: 7px;
+  font-size: 12px;
+  color: var(--muted);
+}
+
+.swatch {
+  width: 12px;
+  height: 12px;
+  border-radius: 3px;
+  display: inline-block;
+}
+
+.pk { background: var(--blue); }
+.fk { background: var(--teal); }
+.cp { background: var(--gold); }
+.geo { background: var(--purple); }
+
+.grid {
+  display: grid;
+  grid-template-columns: repeat(3, minmax(0, 1fr));
+  gap: 13px;
+}
+
+.entity {
+  border: 1px solid var(--line);
+  border-radius: 12px;
+  overflow: hidden;
+  break-inside: avoid;
+}
+
+.entity h4 {
+  font-size: 14px;
+  margin: 0;
+  padding: 10px 12px;
+  background: var(--bluebg);
+  color: #1d3e73;
+}
+
+.entity.player h4 {
+  background: #f1f4f8;
+  color: #35445a;
+}
+
+.entity.route h4 {
+  background: var(--tealbg);
+  color: #075d59;
+}
+
+.entity.join h4 {
+  background: var(--goldbg);
+  color: #79520a;
+}
+
+.entity.reward h4 {
+  background: var(--purplebg);
+  color: #50368f;
+}
+
+.entity ul {
+  list-style: none;
+  margin: 0;
+  padding: 9px 12px;
+}
+
+.entity li {
+  font: 12px/1.6 Consolas, monospace;
+  color: #43536a;
+}
+
+.tag {
+  display: inline-block;
+  font: 700 10px Arial;
+  padding: 1px 5px;
+  border-radius: 4px;
+  margin-right: 5px;
+}
+
+.tag.pk { background: var(--blue); color: white; }
+.tag.fk { background: var(--teal); color: white; }
+.tag.cp { background: var(--gold); color: white; }
+.tag.geo { background: var(--purple); color: white; }
+
+.note {
+  padding: 14px 16px;
+  border-left: 4px solid var(--teal);
+  background: var(--tealbg);
+  border-radius: 8px;
+  margin: 18px 0;
+  color: #234e4b;
+}
+
+.warn {
+  border-left-color: var(--gold);
+  background: var(--goldbg);
+  color: #654d1c;
+}
+
+table {
+  width: 100%;
+  border-collapse: collapse;
+  margin: 10px 0 18px;
+  font-size: 13px;
+}
+
+th, td {
+  text-align: left;
+  vertical-align: top;
+  padding: 10px;
+  border-bottom: 1px solid var(--line);
+}
+
+th {
+  background: #f0f4fa;
+  color: #2a3d5b;
+}
+
+code {
+  font: 12px Consolas, monospace;
+  background: #f0f3f8;
+  padding: 2px 5px;
+  border-radius: 4px;
+  color: #29466f;
+}
+
+.routes {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 14px;
+}
+
+.route-card {
+  border: 1px solid var(--line);
+  border-radius: 12px;
+  padding: 17px;
+}
+
+.route-card h4 {
+  margin: 0 0 6px;
+  font-size: 16px;
+}
+
+.route-card p,
+.route-card li {
+  font-size: 13px;
+}
+
+.route-card ul {
+  margin: 9px 0 0;
+  padding-left: 19px;
+  color: #42536a;
+}
+
+.small {
+  font-size: 12px;
+}
+
+.footer {
+  border-top: 1px solid var(--line);
+  padding-top: 14px;
+  margin-top: 26px;
+  color: var(--muted);
+  font-size: 11px;
+}
+
+@media(max-width:800px) {
+  .grid {
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+  }
+
+  .stats {
+    grid-template-columns: repeat(2, 1fr);
+  }
+
+  .sheet {
+    padding: 26px 22px;
+  }
+}
+
+@media(max-width:560px) {
+  .grid,
+  .routes {
+    grid-template-columns: 1fr;
+  }
+
+  .sheet {
+    padding: 22px 16px;
+  }
+
+  h1 {
+    font-size: 27px;
+  }
+}
+
+@media print {
+  body {
+    background: white;
+  }
+
+  .wrap {
+    max-width: none;
+    margin: 0;
+    padding: 0;
+  }
+
+  .sheet {
+    box-shadow: none;
+    border: 0;
+    border-radius: 0;
+    margin: 0;
+    padding: 14mm;
+    break-after: page;
+  }
+
+  .sheet:last-child {
+    break-after: auto;
+  }
+
+  .entity,
+  .route-card {
+    break-inside: avoid;
+  }
+}
 </style>
 </head>
+
 <body>
+<main class="wrap">
+
 <section class="sheet">
-<div class="eyebrow">Arad Quest · documentatie tehnica</div>
+
+<div class="eyebrow">
+Arad Quest · documentație tehnică · PostgreSQL + PostGIS
+</div>
+
 <h1>Harta bazei de date</h1>
-<p class="subtitle">Schema relationala a bazei de date PostgreSQL pentru aplicatia Arad Quest. Sunt prezentate cele 15 tabele si legaturile dintre ele, prin chei primare (PK) si chei straine (FK).</p>
+
+<p class="lead">
+Structura logică actualizată a bazei de date Arad Quest. Documentul prezintă cele 15 tabele ale aplicației, cheile primare și străine, relațiile dintre entități și cele două trasee incluse în datele inițiale.
+</p>
+
+<div class="stats">
+  <div class="stat">
+    <strong>15</strong>
+    <span>tabele ale aplicației</span>
+  </div>
+
+  <div class="stat">
+    <strong>2</strong>
+    <span>trasee tematice</span>
+  </div>
+
+  <div class="stat">
+    <strong>11</strong>
+    <span>obiective turistice</span>
+  </div>
+
+  <div class="stat">
+    <strong>50 m</strong>
+    <span>raza GPS configurată pentru obiective</span>
+  </div>
+</div>
+
 <div class="legend">
-<span><i class="dot pk"></i> PK – cheie primara</span>
-<span><i class="dot fk"></i> FK – cheie straina</span>
-<span><i class="dot composite"></i> PK compusa – doua sau mai multe coloane</span>
+  <span><i class="swatch pk"></i> PK – cheie primară</span>
+  <span><i class="swatch fk"></i> FK – cheie străină</span>
+  <span><i class="swatch cp"></i> PK compusă</span>
+  <span><i class="swatch geo"></i> câmp geografic PostGIS</span>
 </div>
-<div class="diagram">
-<svg viewBox="0 0 1000 1130" role="img" aria-label="Diagrama relationala a celor 15 tabele Arad Quest">
-<defs><marker id="arr" markerWidth="8" markerHeight="8" refX="6" refY="3" orient="auto"><path d="M0,0 L6,3 L0,6" fill="none" stroke="#8b9ab0" stroke-width="1.2"/></marker></defs>
-<style>
-.box{fill:#fff;stroke:#b9c8dc;stroke-width:1.4;rx:8}.head{fill:#eaf1fc}.head2{fill:#e8f6f4}.head3{fill:#fff4dc}.name{font: bold 13px Arial;fill:#1d3558}.field{font:11px Consolas,monospace;fill:#34445e}.pktext{fill:#2457a7;font-weight:bold}.fktext{fill:#087e78;font-weight:bold}.edge{fill:none;stroke:#8b9ab0;stroke-width:1.5;marker-end:url(#arr)}.edge2{fill:none;stroke:#b18a3a;stroke-width:1.5;stroke-dasharray:5 4;marker-end:url(#arr)}.label{font:10px Arial;fill:#65748b}
-</style>
-<!-- edges behind nodes -->
-<path class="edge" d="M160 100 V160 H160 V200"/><path class="edge" d="M160 250 V310 H160 V350"/>
-<path class="edge" d="M400 100 V150 H400 V200"/><path class="edge" d="M620 100 V150 H620 V200"/>
-<path class="edge" d="M400 250 V300 H400 V350"/><path class="edge" d="M620 250 V300 H620 V350"/>
-<path class="edge" d="M840 100 V160 H840 V200"/><path class="edge" d="M840 250 V300 H840 V350"/>
-<path class="edge" d="M160 400 V470 H160 V510"/><path class="edge" d="M400 400 V470 H400 V510"/>
-<path class="edge" d="M620 400 V470 H620 V510"/><path class="edge" d="M840 400 V470 H840 V510"/>
-<path class="edge" d="M160 560 V630 H160 V670"/><path class="edge" d="M400 560 V630 H400 V670"/>
-<path class="edge" d="M620 560 V630 H620 V670"/><path class="edge" d="M840 560 V630 H840 V670"/>
-<!-- player relationships -->
-<path class="edge2" d="M160 400 H80 V820 H160 V850"/><path class="edge2" d="M160 400 H50 V990 H160 V1010"/>
-<!-- node helper manually -->
-<g transform="translate(55 30)"><rect class="box" width="210" height="70"/><path class="head" d="M8 0 H202 Q210 0 210 8 V27 H0 V8 Q0 0 8 0"/><text class="name" x="10" y="18">clase_jucatori</text><text class="field pktext" x="10" y="43">PK  class_id</text><text class="field" x="10" y="59">class_name, description</text></g>
-<g transform="translate(295 30)"><rect class="box" width="210" height="70"/><path class="head2" d="M8 0 H202 Q210 0 210 8 V27 H0 V8 Q0 0 8 0"/><text class="name" x="10" y="18">obiective_turistice</text><text class="field pktext" x="10" y="43">PK  objective_id</text><text class="field" x="10" y="59">name, location, address…</text></g>
-<g transform="translate(535 30)"><rect class="box" width="210" height="70"/><path class="head" d="M8 0 H202 Q210 0 210 8 V27 H0 V8 Q0 0 8 0"/><text class="name" x="10" y="18">trasee_tematice</text><text class="field pktext" x="10" y="43">PK  route_id</text><text class="field" x="10" y="59">title, difficulty…</text></g>
-<g transform="translate(775 30)"><rect class="box" width="190" height="70"/><path class="head" d="M8 0 H182 Q190 0 190 8 V27 H0 V8 Q0 0 8 0"/><text class="name" x="10" y="18">insigne_disponibile</text><text class="field pktext" x="10" y="43">PK  badge_id</text><text class="field" x="10" y="59">name, points_required</text></g>
-<g transform="translate(55 200)"><rect class="box" width="210" height="70"/><path class="head" d="M8 0 H202 Q210 0 210 8 V27 H0 V8 Q0 0 8 0"/><text class="name" x="10" y="18">jucatori</text><text class="field pktext" x="10" y="43">PK  player_id</text><text class="field fktext" x="10" y="59">FK  class_id</text></g>
-<g transform="translate(295 200)"><rect class="box" width="210" height="70"/><path class="head2" d="M8 0 H202 Q210 0 210 8 V27 H0 V8 Q0 0 8 0"/><text class="name" x="10" y="18">misiuni</text><text class="field pktext" x="10" y="43">PK  mission_id</text><text class="field fktext" x="10" y="59">FK  objective_id</text></g>
-<g transform="translate(535 200)"><rect class="box" width="210" height="70"/><path class="head3" d="M8 0 H202 Q210 0 210 8 V27 H0 V8 Q0 0 8 0"/><text class="name" x="10" y="18">ordine_obiective_traseu</text><text class="field pktext" x="10" y="43">PK  route_id + objective_id</text><text class="field fktext" x="10" y="59">FK  route_id, objective_id</text></g>
-<g transform="translate(775 200)"><rect class="box" width="190" height="70"/><path class="head3" d="M8 0 H182 Q190 0 190 8 V27 H0 V8 Q0 0 8 0"/><text class="name" x="10" y="18">insigne_jucatori</text><text class="field pktext" x="10" y="43">PK  player_id + badge_id</text><text class="field fktext" x="10" y="59">FK  player_id, badge_id</text></g>
-<g transform="translate(55 350)"><rect class="box" width="210" height="70"/><path class="head2" d="M8 0 H202 Q210 0 210 8 V27 H0 V8 Q0 0 8 0"/><text class="name" x="10" y="18">progres_jucatori_trasee</text><text class="field pktext" x="10" y="43">PK  player_id + route_id</text><text class="field fktext" x="10" y="59">FK  player_id, route_id</text></g>
-<g transform="translate(295 350)"><rect class="box" width="210" height="70"/><path class="head2" d="M8 0 H202 Q210 0 210 8 V27 H0 V8 Q0 0 8 0"/><text class="name" x="10" y="18">indicii</text><text class="field pktext" x="10" y="43">PK  clue_id</text><text class="field fktext" x="10" y="59">FK  mission_id</text></g>
-<g transform="translate(535 350)"><rect class="box" width="210" height="70"/><path class="head2" d="M8 0 H202 Q210 0 210 8 V27 H0 V8 Q0 0 8 0"/><text class="name" x="10" y="18">raspunsuri_corecte</text><text class="field pktext" x="10" y="43">PK  solution_id</text><text class="field fktext" x="10" y="59">FK  mission_id</text></g>
-<g transform="translate(775 350)"><rect class="box" width="190" height="70"/><path class="head" d="M8 0 H182 Q190 0 190 8 V27 H0 V8 Q0 0 8 0"/><text class="name" x="10" y="18">recompense_disponibile</text><text class="field pktext" x="10" y="43">PK  reward_id</text><text class="field" x="10" y="59">name, points_cost</text></g>
-<g transform="translate(55 510)"><rect class="box" width="210" height="70"/><path class="head2" d="M8 0 H202 Q210 0 210 8 V27 H0 V8 Q0 0 8 0"/><text class="name" x="10" y="18">progres_jucatori_misiuni</text><text class="field pktext" x="10" y="43">PK  player_id + mission_id</text><text class="field fktext" x="10" y="59">FK  player_id, mission_id</text></g>
-<g transform="translate(295 510)"><rect class="box" width="210" height="70"/><path class="head2" d="M8 0 H202 Q210 0 210 8 V27 H0 V8 Q0 0 8 0"/><text class="name" x="10" y="18">raspunsuri_trimise</text><text class="field pktext" x="10" y="43">PK  attempt_id</text><text class="field fktext" x="10" y="59">FK  player_id + mission_id</text></g>
-<g transform="translate(535 510)"><rect class="box" width="210" height="70"/><path class="head3" d="M8 0 H202 Q210 0 210 8 V27 H0 V8 Q0 0 8 0"/><text class="name" x="10" y="18">recompense_revendicate</text><text class="field pktext" x="10" y="43">PK  claim_id</text><text class="field fktext" x="10" y="59">FK  player_id, reward_id</text></g>
-<g transform="translate(775 510)"><rect class="box" width="190" height="70"/><path class="head" d="M8 0 H182 Q190 0 190 8 V27 H0 V8 Q0 0 8 0"/><text class="name" x="10" y="18">(alte date de joc)</text><text class="field" x="10" y="43">vezi tabelele</text><text class="field" x="10" y="59">de mai sus</text></g>
-<text x="55" y="640" class="label">Relatiile sunt descrise detaliat in pagina 2. Diagrama este o vedere de ansamblu; legaturile se citesc dupa coloanele FK.</text>
-<g transform="translate(55 680)"><rect class="box" width="430" height="105"/><path class="head" d="M8 0 H422 Q430 0 430 8 V29 H0 V8 Q0 0 8 0"/><text class="name" x="12" y="20">Cum se citesc legaturile</text><text class="field" x="14" y="51">PK  = identificator unic al randului</text><text class="field" x="14" y="70">FK  = valoare care refera PK-ul altui tabel</text><text class="field" x="14" y="89">PK compusa = identificare prin combinatia coloanelor</text></g>
-<g transform="translate(515 680)"><rect class="box" width="450" height="105"/><path class="head2" d="M8 0 H442 Q450 0 450 8 V29 H0 V8 Q0 0 8 0"/><text class="name" x="12" y="20">Exemplu de legatura</text><text class="field" x="14" y="51">jucatori.class_id → clase_jucatori.class_id</text><text class="field" x="14" y="70">misiuni.objective_id → obiective_turistice.objective_id</text><text class="field" x="14" y="89">indicii.mission_id → misiuni.mission_id</text></g>
-</svg>
-</div>
-<div class="note"><strong>Nota pentru backend:</strong> diagrama descrie structura relationala convenita pentru proiect. In tabelele de progres, PK-urile compuse identifica progresul unui anumit jucator pentru un anumit traseu sau o anumita misiune.</div>
-<div class="footer">Arad Quest · Baza de date PostgreSQL + PostGIS · Pagina 1 din 2</div>
-</section>
-<section class="sheet page-two">
-<div class="eyebrow">Arad Quest · referinta pentru backend</div>
-<h2>Chei primare, chei straine si explicatia relatiilor</h2>
-<p>PK identifica unic un rand in tabel. FK leaga un rand de un rand existent din alt tabel. Sageata din coloana „Legatura FK” indica tabelul si coloana la care se refera cheia straina.</p>
-<h3>1. Utilizatori si clase</h3>
-<table><thead><tr><th>Tabel</th><th>PK</th><th>FK / referinta</th><th>Relatie</th></tr></thead><tbody>
-<tr><td><code>clase_jucatori</code></td><td><code>class_id</code></td><td>—</td><td>O clasa poate fi atribuita mai multor jucatori.</td></tr>
-<tr><td><code>jucatori</code></td><td><code>player_id</code></td><td><code>class_id → clase_jucatori.class_id</code></td><td>Fiecare jucator poate avea o clasa; o clasa poate avea multi jucatori (1:N).</td></tr>
-</tbody></table>
-<h3>2. Obiective turistice si trasee</h3>
-<table><thead><tr><th>Tabel</th><th>PK</th><th>FK / referinta</th><th>Relatie</th></tr></thead><tbody>
-<tr><td><code>obiective_turistice</code></td><td><code>objective_id</code></td><td>—</td><td>Un obiectiv poate fi inclus in mai multe trasee si poate avea mai multe misiuni.</td></tr>
-<tr><td><code>trasee_tematice</code></td><td><code>route_id</code></td><td>—</td><td>Un traseu contine mai multe obiective.</td></tr>
-<tr><td><code>ordine_obiective_traseu</code></td><td><code>(route_id, objective_id)</code></td><td><code>route_id → trasee_tematice.route_id</code><br><code>objective_id → obiective_turistice.objective_id</code></td><td>Tabel intermediar M:N. <code>sequence_number</code> pastreaza ordinea obiectivelor in traseu. Exista si UNIQUE(route_id, sequence_number).</td></tr>
-</tbody></table>
-<h3>3. Misiuni, indicii si raspunsuri corecte</h3>
-<table><thead><tr><th>Tabel</th><th>PK</th><th>FK / referinta</th><th>Relatie</th></tr></thead><tbody>
-<tr><td><code>misiuni</code></td><td><code>mission_id</code></td><td><code>objective_id → obiective_turistice.objective_id</code></td><td>Un obiectiv poate avea mai multe misiuni (1:N).</td></tr>
-<tr><td><code>indicii</code></td><td><code>clue_id</code></td><td><code>mission_id → misiuni.mission_id</code></td><td>O misiune poate avea mai multe indicii (1:N). Ordinea este pastrata prin <code>clue_order</code>.</td></tr>
-<tr><td><code>raspunsuri_corecte</code></td><td><code>solution_id</code></td><td><code>mission_id → misiuni.mission_id</code></td><td>O misiune poate accepta mai multe variante de raspuns (1:N).</td></tr>
-</tbody></table>
-<h3>4. Progresul jucatorilor si raspunsurile trimise</h3>
-<table><thead><tr><th>Tabel</th><th>PK</th><th>FK / referinta</th><th>Relatie</th></tr></thead><tbody>
-<tr><td><code>progres_jucatori_trasee</code></td><td><code>(player_id, route_id)</code></td><td><code>player_id → jucatori.player_id</code><br><code>route_id → trasee_tematice.route_id</code></td><td>Tabel intermediar M:N; o inregistrare per jucator si traseu.</td></tr>
-<tr><td><code>progres_jucatori_misiuni</code></td><td><code>(player_id, mission_id)</code></td><td><code>player_id → jucatori.player_id</code><br><code>mission_id → misiuni.mission_id</code></td><td>Tabel intermediar M:N; o inregistrare per jucator si misiune.</td></tr>
-<tr><td><code>raspunsuri_trimise</code></td><td><code>attempt_id</code></td><td><code>(player_id, mission_id) → progres_jucatori_misiuni(player_id, mission_id)</code></td><td>Un progres poate avea mai multe incercari de raspuns (1:N). FK-ul este compus.</td></tr>
-</tbody></table>
-<h3>5. Insigne si recompense</h3>
-<table><thead><tr><th>Tabel</th><th>PK</th><th>FK / referinta</th><th>Relatie</th></tr></thead><tbody>
-<tr><td><code>insigne_disponibile</code></td><td><code>badge_id</code></td><td>—</td><td>Catalogul insignelor care pot fi obtinute.</td></tr>
-<tr><td><code>insigne_jucatori</code></td><td><code>(player_id, badge_id)</code></td><td><code>player_id → jucatori.player_id</code><br><code>badge_id → insigne_disponibile.badge_id</code></td><td>Tabel intermediar M:N; retine si <code>earned_at</code>.</td></tr>
-<tr><td><code>recompense_disponibile</code></td><td><code>reward_id</code></td><td>—</td><td>Catalogul recompenselor disponibile.</td></tr>
-<tr><td><code>recompense_revendicate</code></td><td><code>claim_id</code></td><td><code>player_id → jucatori.player_id</code><br><code>reward_id → recompense_disponibile.reward_id</code></td><td>Inregistreaza revendicarile. Un jucator poate revendica mai multe recompense; o recompensa poate fi revendicata de mai multi jucatori.</td></tr>
-</tbody></table>
-<h3>Note utile pentru implementarea backend-ului</h3>
+
+<h2>Inventarul tabelelor</h2>
+
+<p class="small">
+Câmpurile de mai jos sunt o vedere de ansamblu, nu o listă exhaustivă a tuturor constrângerilor și tipurilor de date.
+</p>
+
+<div class="grid">
+
+<article class="entity player">
+<h4>1. clase_jucatori</h4>
 <ul>
-<li><strong>PK compusa:</strong> pentru <code>progres_jucatori_misiuni</code>, identificatorul este perechea <code>(player_id, mission_id)</code>, nu o singura coloana. La inserarea raspunsului, backend-ul trebuie sa trimita ambele valori.</li>
-<li><strong>Parole:</strong> <code>jucatori.password_hash</code> trebuie sa contina doar hash-ul parolei, generat si verificat in backend cu Argon2id sau bcrypt. Nu se salveaza parole in clar.</li>
-<li><strong>Puncte si recompense:</strong> backend-ul trebuie sa verifice soldul punctelor si stocul recompensei si sa actualizeze datele intr-o tranzactie.</li>
-<li><strong>Raspunsuri corecte:</strong> tabelul <code>raspunsuri_corecte</code> contine solutiile acceptate; acestea nu trebuie expuse direct in frontend.</li>
-<li><strong>Coordonate:</strong> <code>obiective_turistice.location</code> este <code>GEOGRAPHY(POINT, 4326)</code> (PostGIS), folosita pentru pozitia GPS; nu este cheie de relatie.</li>
+<li><b class="tag pk">PK</b>class_id</li>
+<li>class_name</li>
+<li>description</li>
 </ul>
-<div class="note"><strong>Rezumat:</strong> cele 15 tabele folosesc chei primare simple sau compuse. Relatiile M:N sunt implementate prin tabele intermediare, iar FK-urile pastreaza integritatea legaturilor dintre jucatori, trasee, obiective, misiuni, insigne si recompense.</div>
-<div class="footer">Arad Quest · Document pregatit pentru colaborarea cu echipa de backend · Pagina 2 din 2</div>
+</article>
+
+<article class="entity player">
+<h4>2. jucatori</h4>
+<ul>
+<li><b class="tag pk">PK</b>player_id</li>
+<li>username, email</li>
+<li>password_hash</li>
+<li>total_points, created_at</li>
+<li>avatar_id (1–4)</li>
+</ul>
+</article>
+
+<article class="entity route">
+<h4>3. obiective_turistice</h4>
+<ul>
+<li><b class="tag pk">PK</b>objective_id</li>
+<li>name, description, address</li>
+<li>image_url</li>
+<li><b class="tag geo">GIS</b>location</li>
+<li>radius_meters, is_active</li>
+</ul>
+</article>
+
+<article class="entity route">
+<h4>4. trasee_tematice</h4>
+<ul>
+<li><b class="tag pk">PK</b>route_id</li>
+<li>title, description</li>
+<li>difficulty, estimated_minutes</li>
+<li>is_active</li>
+</ul>
+</article>
+
+<article class="entity join">
+<h4>5. ordine_obiective_traseu</h4>
+<ul>
+<li><b class="tag cp">PK</b>route_id + objective_id</li>
+<li><b class="tag fk">FK</b>route_id</li>
+<li><b class="tag fk">FK</b>objective_id</li>
+<li>sequence_number</li>
+</ul>
+</article>
+
+<article class="entity route">
+<h4>6. misiuni</h4>
+<ul>
+<li><b class="tag pk">PK</b>mission_id</li>
+<li><b class="tag fk">FK</b>objective_id</li>
+<li>title, description</li>
+<li>points_reward, is_active</li>
+</ul>
+</article>
+
+<article class="entity route">
+<h4>7. indicii</h4>
+<ul>
+<li><b class="tag pk">PK</b>clue_id</li>
+<li><b class="tag fk">FK</b>mission_id</li>
+<li>clue_text, clue_order</li>
+</ul>
+</article>
+
+<article class="entity route">
+<h4>8. raspunsuri_corecte</h4>
+<ul>
+<li><b class="tag pk">PK</b>solution_id</li>
+<li><b class="tag fk">FK</b>mission_id</li>
+<li>accepted_answer</li>
+</ul>
+</article>
+
+<article class="entity join">
+<h4>9. progres_jucatori_trasee</h4>
+<ul>
+<li><b class="tag cp">PK</b>player_id + route_id</li>
+<li><b class="tag fk">FK</b>player_id</li>
+<li><b class="tag fk">FK</b>route_id</li>
+<li>status, started_at, completed_at</li>
+</ul>
+</article>
+
+<article class="entity join">
+<h4>10. progres_jucatori_misiuni</h4>
+<ul>
+<li><b class="tag cp">PK</b>player_id + mission_id</li>
+<li><b class="tag fk">FK</b>player_id</li>
+<li><b class="tag fk">FK</b>mission_id</li>
+<li>status, timestamps, points_awarded</li>
+</ul>
+</article>
+
+<article class="entity">
+<h4>11. raspunsuri_trimise</h4>
+<ul>
+<li><b class="tag pk">PK</b>attempt_id</li>
+<li><b class="tag fk">FK</b>player_id + mission_id</li>
+<li>answer_text, is_correct</li>
+<li>submitted_at</li>
+</ul>
+</article>
+
+<article class="entity reward">
+<h4>12. insigne_disponibile</h4>
+<ul>
+<li><b class="tag pk">PK</b>badge_id</li>
+<li>name, points_required</li>
+</ul>
+</article>
+
+<article class="entity join">
+<h4>13. insigne_jucatori</h4>
+<ul>
+<li><b class="tag cp">PK</b>player_id + badge_id</li>
+<li><b class="tag fk">FK</b>player_id</li>
+<li><b class="tag fk">FK</b>badge_id</li>
+<li>earned_at</li>
+</ul>
+</article>
+
+<article class="entity reward">
+<h4>14. recompense_disponibile</h4>
+<ul>
+<li><b class="tag pk">PK</b>reward_id</li>
+<li>name, points_cost</li>
+<li>alte detalii ale recompensei</li>
+</ul>
+</article>
+
+<article class="entity reward">
+<h4>15. recompense_revendicate</h4>
+<ul>
+<li><b class="tag pk">PK</b>claim_id</li>
+<li><b class="tag fk">FK</b>player_id</li>
+<li><b class="tag fk">FK</b>reward_id</li>
+<li>date privind revendicarea</li>
+</ul>
+</article>
+
+</div>
+
+<div class="note">
+<strong>Important – clase și jucători:</strong>
+tabelul <code>clase_jucatori</code> există în schema aplicației, dar în structura actuală <code>jucatori</code> nu are coloana <code>class_id</code> și nu are o cheie străină către <code>clase_jucatori</code>. Câmpul de avatar al jucătorului este <code>avatar_id</code>, cu valori permise între 1 și 4.
+</div>
+
+<div class="footer">
+Arad Quest · Harta bazei de date · versiune actualizată pentru structura curentă descrisă în documentație
+</div>
+
 </section>
+
+<section class="sheet">
+
+<div class="eyebrow">
+Arad Quest · model relațional
+</div>
+
+<h2>Relațiile dintre tabele</h2>
+
+<p>
+Cheile străine mențin integritatea referențială. Relațiile de tip many-to-many (M:N) sunt implementate prin tabele intermediare cu chei primare compuse.
+</p>
+
+<h3>Relații principale</h3>
+
+<table>
+<thead>
+<tr>
+<th>Tabel sursă</th>
+<th>Coloana FK</th>
+<th>Tabel referit</th>
+<th>Semnificație</th>
+</tr>
+</thead>
+
+<tbody>
+
+<tr>
+<td><code>misiuni</code></td>
+<td><code>objective_id</code></td>
+<td><code>obiective_turistice.objective_id</code></td>
+<td>Un obiectiv poate avea mai multe misiuni (1:N).</td>
+</tr>
+
+<tr>
+<td><code>indicii</code></td>
+<td><code>mission_id</code></td>
+<td><code>misiuni.mission_id</code></td>
+<td>O misiune poate avea mai multe indicii (1:N).</td>
+</tr>
+
+<tr>
+<td><code>raspunsuri_corecte</code></td>
+<td><code>mission_id</code></td>
+<td><code>misiuni.mission_id</code></td>
+<td>O misiune poate avea una sau mai multe variante acceptate (1:N).</td>
+</tr>
+
+<tr>
+<td><code>ordine_obiective_traseu</code></td>
+<td><code>route_id</code></td>
+<td><code>trasee_tematice.route_id</code></td>
+<td>Leagă obiectivele de trasee (M:N).</td>
+</tr>
+
+<tr>
+<td><code>ordine_obiective_traseu</code></td>
+<td><code>objective_id</code></td>
+<td><code>obiective_turistice.objective_id</code></td>
+<td>Păstrează ordinea prin <code>sequence_number</code>.</td>
+</tr>
+
+<tr>
+<td><code>progres_jucatori_trasee</code></td>
+<td><code>player_id</code></td>
+<td><code>jucatori.player_id</code></td>
+<td>Leagă jucătorii de traseele începute/completate.</td>
+</tr>
+
+<tr>
+<td><code>progres_jucatori_trasee</code></td>
+<td><code>route_id</code></td>
+<td><code>trasee_tematice.route_id</code></td>
+<td>O înregistrare pentru fiecare pereche jucător–traseu.</td>
+</tr>
+
+<tr>
+<td><code>progres_jucatori_misiuni</code></td>
+<td><code>player_id</code></td>
+<td><code>jucatori.player_id</code></td>
+<td>Înregistrează progresul unui jucător la o misiune.</td>
+</tr>
+
+<tr>
+<td><code>progres_jucatori_misiuni</code></td>
+<td><code>mission_id</code></td>
+<td><code>misiuni.mission_id</code></td>
+<td>PK compusă: <code>(player_id, mission_id)</code>.</td>
+</tr>
+
+<tr>
+<td><code>raspunsuri_trimise</code></td>
+<td><code>(player_id, mission_id)</code></td>
+<td><code>progres_jucatori_misiuni(player_id, mission_id)</code></td>
+<td>Un progres poate avea mai multe încercări de răspuns.</td>
+</tr>
+
+<tr>
+<td><code>insigne_jucatori</code></td>
+<td><code>player_id</code></td>
+<td><code>jucatori.player_id</code></td>
+<td>Asociază insignele câștigate unui jucător.</td>
+</tr>
+
+<tr>
+<td><code>insigne_jucatori</code></td>
+<td><code>badge_id</code></td>
+<td><code>insigne_disponibile.badge_id</code></td>
+<td>PK compusă: <code>(player_id, badge_id)</code>.</td>
+</tr>
+
+<tr>
+<td><code>recompense_revendicate</code></td>
+<td><code>player_id</code></td>
+<td><code>jucatori.player_id</code></td>
+<td>Înregistrează jucătorul care revendică recompensa.</td>
+</tr>
+
+<tr>
+<td><code>recompense_revendicate</code></td>
+<td><code>reward_id</code></td>
+<td><code>recompense_disponibile.reward_id</code></td>
+<td>O recompensă poate fi revendicată de mai mulți jucători.</td>
+</tr>
+
+</tbody>
+</table>
+
+<div class="note warn">
+<strong>Tabel fără relație directă:</strong>
+<code>clase_jucatori</code> este păstrat în baza de date, dar nu are în prezent o relație FK cu <code>jucatori</code>. Nu presupuneți o asociere între jucători și clase în backend sau frontend.
+</div>
+
+<h3>Note de implementare</h3>
+
+<ul>
+<li><strong>Parole:</strong> <code>jucatori.password_hash</code> trebuie să conțină hash-ul parolei (de exemplu Argon2id sau bcrypt), niciodată parola în clar.</li>
+
+<li><strong>Avatar:</strong> <code>avatar_id</code> este obligatoriu și trebuie să respecte intervalul 1–4.</li>
+
+<li><strong>Răspunsuri corecte:</strong> valorile din <code>raspunsuri_corecte</code> trebuie verificate în backend și nu trebuie trimise către frontend.</li>
+
+<li><strong>Validare GPS:</strong> <code>obiective_turistice.location</code> este un punct PostGIS de tip <code>GEOGRAPHY</code>; <code>radius_meters</code> definește raza permisă pentru obiectiv. Backend-ul trebuie să citească raza din baza de date, nu să o hardcodeze.</li>
+
+<li><strong>Ordinea validărilor:</strong> backend-ul verifică mai întâi dacă jucătorul se află în raza GPS și abia apoi verifică răspunsul.</li>
+
+<li><strong>Puncte:</strong> acordarea punctelor și actualizarea progresului trebuie făcute atomic, într-o tranzacție, evitând acordarea repetată a punctelor pentru aceeași misiune.</li>
+
+<li><strong>Recompense:</strong> verificarea punctelor disponibile și înregistrarea revendicării trebuie realizate într-o tranzacție. Detaliile unui mecanism QR nu sunt incluse ca structură confirmată în această versiune.</li>
+</ul>
+
+<h3>Datele inițiale ale aplicației</h3>
+
+<div class="routes">
+
+<article class="route-card">
+<h4>Descopera Aradul</h4>
+<p>Traseu cultural · 6 obiective · 130 puncte posibile</p>
+<ul>
+<li>Primaria Arad</li>
+<li>Biserica Rosie</li>
+<li>Colegiul National Moise Nicoara</li>
+<li>Teatrul Clasic Ioan Slavici</li>
+<li>Filarmonica</li>
+<li>Vechiul Cazinou</li>
+</ul>
+</article>
+
+<article class="route-card">
+<h4>Traseul in natura</h4>
+<p>Traseu de recreere · 5 obiective · 100 puncte posibile</p>
+<ul>
+<li>Parcul Micalaca – Zona 300</li>
+<li>Parcul Europa</li>
+<li>Parcul de la Podgoria</li>
+<li>Parcul Copiilor</li>
+<li>Faleza Muresului – zona Gloria (Tenis Club Pro)</li>
+</ul>
+</article>
+
+</div>
+
+<div class="note">
+<strong>Notă PostGIS:</strong>
+coordonatele sunt stocate în coloana <code>location</code>. La construirea unui punct cu <code>ST_MakePoint</code>, ordinea argumentelor este longitudine, apoi latitudine. Sistemul de referință utilizat este EPSG:4326.
+</div>
+
+<p class="small">
+În baza de date pot exista și tabele tehnice create de extensii PostgreSQL/PostGIS, de exemplu <code>spatial_ref_sys</code>. Acestea nu fac parte din cele 15 tabele funcționale ale aplicației Arad Quest.
+</p>
+
+<div class="footer">
+Arad Quest · Referință pentru echipa de backend și frontend · Pagina 2 din 2
+</div>
+
+</section>
+
+</main>
 </body>
 </html>
