@@ -3,7 +3,7 @@ import { useNavigate } from "react-router-dom";
 
 import aradQuestLogo from "../../assets/images/backgrounds/aradquest-logo.png";
 import { loginUser } from "../services/authService";
-import { useAuth } from "../context/AuthContext";
+import { useAuth } from "../context/useAuth.js";
 
 import "../styles/LoginPage.css";
 

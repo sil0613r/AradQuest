@@ -13,7 +13,8 @@ function readUsers() {
 
 // Remove private fields from the public user profile.
 function toPublicUser(user) {
-  const { password, ...publicUser } = user;
+  const publicUser = { ...user };
+  delete publicUser.password;
   return publicUser;
 }
 

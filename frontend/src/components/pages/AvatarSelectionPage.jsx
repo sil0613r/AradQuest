@@ -1,6 +1,6 @@
 import { useState } from "react";
 import { useNavigate } from "react-router-dom";
-import { useAuth } from "../context/AuthContext.jsx";
+import { useAuth } from "../context/useAuth.js";
 import { updateProfile } from "../services/authService.js";
 import aradQuestLogo from "../../assets/images/backgrounds/aradquest-logo.png";
 import "../styles/AvatarSelectionPage.css";

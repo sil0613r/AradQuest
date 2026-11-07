@@ -79,17 +79,7 @@ CREATE TABLE IF NOT EXISTS misiuni (
     CHECK (points_reward >= 0)
 );
 
--- 7. Indicii
-CREATE TABLE IF NOT EXISTS indicii (
-    clue_id SERIAL PRIMARY KEY,
-    mission_id INTEGER NOT NULL
-        REFERENCES misiuni(mission_id) ON DELETE CASCADE,
-    clue_text TEXT NOT NULL,
-    clue_order INTEGER NOT NULL DEFAULT 1,
-    UNIQUE (mission_id, clue_order)
-);
-
--- 8. Raspunsuri corecte acceptate
+-- 7. Raspunsuri corecte acceptate
 CREATE TABLE IF NOT EXISTS raspunsuri_corecte (
     solution_id SERIAL PRIMARY KEY,
     mission_id INTEGER NOT NULL
@@ -125,6 +115,11 @@ CREATE TABLE IF NOT EXISTS progres_jucatori_misiuni (
     CHECK (points_awarded >= 0),
     CHECK (status <> 'completed' OR completed_at IS NOT NULL)
 );
+
+-- Hints the player has paid for on this location (one point cost each, see api/game.py).
+-- Added with ALTER so that databases created before this column existed get it too.
+ALTER TABLE progres_jucatori_misiuni
+    ADD COLUMN IF NOT EXISTS hints_used INTEGER NOT NULL DEFAULT 0 CHECK (hints_used >= 0);
 
 -- 11. Raspunsuri trimise de jucatori
 CREATE TABLE IF NOT EXISTS raspunsuri_trimise (

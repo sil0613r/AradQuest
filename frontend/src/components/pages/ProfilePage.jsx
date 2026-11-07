@@ -2,7 +2,7 @@ import { useState } from "react";
 import { useNavigate } from "react-router-dom";
 import "../styles/ProfilePage.css";
 import Sidebar from "../layout/Sidebar.jsx";
-import { useAuth } from "../context/AuthContext.jsx";
+import { useAuth } from "../context/useAuth.js";
 
 // Arad Quest assets
 import explorerAvatar from "../../assets/images/avatars/explorer.png";

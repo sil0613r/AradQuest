@@ -39,10 +39,15 @@ export function getProgress() {
   return apiRequest("/progress");
 }
 
-// Clear the player's progress on one adventure and take back its points.
-export function resetAdventureProgress(adventureId) {
-  return apiRequest("/progress/reset", {
+// The riddle for a location, plus the hints the player has already opened (in order) and the hint cost.
+export function getMission(locationId) {
+  return apiRequest(`/locations/${encodeURIComponent(locationId)}/mission`);
+}
+
+// Open the next hint for a location. The server takes the hint cost from the player's points.
+export function requestNextHint(locationId) {
+  return apiRequest("/hints/next", {
     method: "POST",
-    body: { adventureId },
+    body: { locationId },
   });
 }

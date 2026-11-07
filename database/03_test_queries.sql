@@ -73,20 +73,7 @@ JOIN misiuni m
 ORDER BY ot.name;
 
 
--- 5. Afisarea indiciilor unei misiuni
--- Indiciile sunt afisate in ordinea stabilita.
-
-SELECT
-    m.title AS mission_name,
-    i.clue_order,
-    i.clue_text
-FROM misiuni m
-JOIN indicii i
-    ON m.mission_id = i.mission_id
-ORDER BY m.mission_id, i.clue_order;
-
-
--- 6. Afisarea progresului unui jucator pe misiuni
+-- 5. Afisarea progresului unui jucator pe misiuni
 -- Inlocuieste test_player cu numele jucatorului dorit.
 
 SELECT

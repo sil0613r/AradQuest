@@ -1,11 +1,9 @@
 //this will be the context for the auth state, it will provide the auth state to all components that need it
 
-import { createContext, useContext, useEffect, useState } from "react";
+import { useEffect, useState } from "react";
 
 import { getCurrentUser, logoutUser } from "../services/authService.js";
-
-// Share authentication state across the application.
-const AuthContext = createContext(null);
+import { AuthContext } from "./authContextObject.js";
 
 export function AuthProvider({ children }) {
   const [user, setUser] = useState(null);
@@ -67,15 +65,4 @@ export function AuthProvider({ children }) {
       {children}
     </AuthContext.Provider>
   );
-}
-
-// Allow components to access authentication state.
-export function useAuth() {
-  const context = useContext(AuthContext);
-
-  if (!context) {
-    throw new Error("useAuth must be used within AuthProvider.");
-  }
-
-  return context;
 }

@@ -34,6 +34,8 @@ ANSWER_ATTEMPT_FALLBACK = (
 )
 
 # ---- Server ----
+# Shared secret between the game API and this service (private network only). Empty = internal route off.
+INTERNAL_TOKEN = os.getenv("INTERNAL_TOKEN", "").strip()
 ALLOWED_ORIGINS = [o.strip() for o in os.getenv("ALLOWED_ORIGINS", "http://localhost:5500").split(",") if o.strip()]
 RATE_LIMIT_PER_MINUTE = 20         # chat messages per IP per minute
 SESSION_TTL_SECONDS = 2 * 60 * 60  # idle chats are dropped after 2 hours

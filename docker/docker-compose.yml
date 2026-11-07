@@ -36,6 +36,8 @@ services:
       # Overrides api/.env: inside Docker the database host is the "db" service, not localhost.
       DB_HOST: db
       DB_PORT: "5432"
+      # The chatbot service holds the hint texts. Its token is in api/secrets.env (BOT_INTERNAL_TOKEN).
+      BOT_INTERNAL_URL: http://bot:8000
     ports:
       - "${API_PORT}:8000"
     depends_on:

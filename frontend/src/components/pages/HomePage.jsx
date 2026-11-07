@@ -1,8 +1,8 @@
 import { useState } from "react";
-import { Link, useNavigate } from "react-router-dom";
+import { useNavigate } from "react-router-dom";
 import "../styles/HomePage.css";
 import Sidebar from "../layout/Sidebar.jsx";
-import { useAuth } from "../context/AuthContext.jsx";
+import { useAuth } from "../context/useAuth.js";
 import explorerAvatar from "../../assets/images/avatars/explorer.png";
 import adventurerAvatar from "../../assets/images/avatars/adventurer.png";
 import championAvatar from "../../assets/images/avatars/champion.png";
@@ -11,17 +11,6 @@ import heroImage from "../../assets/images/backgrounds/hero.JPG";
 
 import natureImage from "../../assets/images/backgrounds/nature-adventure.JPG";
 import historyImage from "../../assets/images/backgrounds/history-adventure.JPG";
-// Navigation items
-const navigationItems = [
-  { name: "Home", icon: "⌂", path: "/home" },
-  { name: "My Adventures", icon: "◈", path: "/adventures" },
-  { name: "Rewards", icon: "☆", path: "/rewards" },
-  { name: "Map", icon: "♧", path: "/map" },
-  { name: "Profile", icon: "♙", path: "/profile" },
-  { name: "About", icon: "ⓘ", path: "/about" },
-  { name: "Settings", icon: "⚙", path: "/settings" },
-];
-
 // Avatar information
 const avatarOptions = {
   explorer: {
@@ -79,11 +68,6 @@ function HomePage() {
     points: 0,
     completed: 0,
     rewards: 0,
-  };
-
-  const handleNavigation = (path) => {
-    setMenuOpen(false);
-    navigate(path);
   };
 
   return (

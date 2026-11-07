@@ -42,3 +42,8 @@ SESSION_SECRET = _required("SESSION_SECRET")      # long random string, signs th
 ALLOWED_ORIGINS = [o.strip() for o in os.getenv("ALLOWED_ORIGINS", "http://localhost:5173").split(",") if o.strip()]
 COOKIE_SECURE = os.getenv("COOKIE_SECURE", "false").lower() == "true"   # true on HTTPS deployments
 SESSION_MAX_AGE_SECONDS = 7 * 24 * 60 * 60
+
+# The chatbot service holds the mission texts and hints (ai_bot/backend/missions.json).
+# Private-network address and the shared secret. Empty = hints are unavailable.
+BOT_INTERNAL_URL = os.getenv("BOT_INTERNAL_URL", "").strip().rstrip("/")
+BOT_INTERNAL_TOKEN = os.getenv("BOT_INTERNAL_TOKEN", "").strip()

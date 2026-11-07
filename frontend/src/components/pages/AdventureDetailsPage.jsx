@@ -1,4 +1,4 @@
-import { useState, useEffect } from "react";
+import { useState, useEffect, useMemo } from "react";
 
 import { useNavigate, useParams } from "react-router-dom";
 
@@ -6,7 +6,13 @@ import "../styles/AdventureDetailsPage.css";
 import Sidebar from "../layout/Sidebar.jsx";
 import { historyImages } from "../data/historyImages.js";
 import { getOrderedLocations } from "../utils/generateAdventureRoute.js";
-import { getCurrentPosition, getProgress, resetAdventureProgress, verifyLocationAnswer } from "../services/gameService.js";
+import {
+  getCurrentPosition,
+  getMission,
+  getProgress,
+  requestNextHint,
+  verifyLocationAnswer,
+} from "../services/gameService.js";
 
 import AdventureOverview from "../adventures/AdventureOverview.jsx";
 import natureImage from "../../assets/images/backgrounds/nature-adventure.JPG";
@@ -16,7 +22,7 @@ import AdventureGameplay from "../adventures/AdventureGameplay.jsx";
 import VisualHintCarousel from "../adventures/VisualHintCarousel.jsx";
 
 // Temporary adventure data.
-// Locations and clues will eventually be loaded from FastAPI.
+// Locations will eventually be loaded from FastAPI. Riddles and hints come from the server (ai_bot missions).
 const adventureData = {
   nature: {
     title: "Nature Explorer",
@@ -39,7 +45,7 @@ const adventureData = {
 
         name: "Parcul Micălaca – Zona 300",
 
-        // This description remains fixed for all three clues.
+        // Fixed location description. The riddle and hints come from the server.
         locationDescription:
           "La marginea cartierului Micălaca, acolo unde orașul " +
           "se întâlnește cu faleza Mureșului, se întinde un " +
@@ -47,48 +53,12 @@ const adventureData = {
           "locuri de joacă îl transformă într-un punct de " +
           "întâlnire pentru toate vârstele.",
 
-        clues: [
-          {
-            id: "nature-1-clue-1",
-
-            title: "The First Discovery",
-
-            description: "Câte locuri pentru grătar au fost prevăzute în parc?",
-
-            hint: "Look for information about the park facilities.",
-
-            visualHints: [natureImage, natureImage, natureImage],
-          },
-
-          {
-            id: "nature-1-clue-2",
-
-            title: "The Second Discovery",
-
-            description: "Second clue question goes here.",
-
-            hint: "Second clue hint goes here.",
-
-            visualHints: [natureImage, natureImage, natureImage],
-          },
-
-          {
-            id: "nature-1-clue-3",
-
-            title: "The Final Discovery",
-
-            description: "Third clue question goes here.",
-
-            hint: "Third clue hint goes here.",
-
-            visualHints: [natureImage, natureImage, natureImage],
-          },
-        ],
+        visualHints: [natureImage, natureImage, natureImage],
       },
 
-      // TODO: Add Nature Location 2 with its three clues.
-      // TODO: Add Nature Location 3 with its three clues.
-      // TODO: Add Nature Location 4 with its three clues.
+      // TODO: Add Nature Location 2 with its photos.
+      // TODO: Add Nature Location 3 with its photos.
+      // TODO: Add Nature Location 4 with its photos.
     ],
   },
 
@@ -115,102 +85,36 @@ const adventureData = {
         points: 20,
         locationDescription:
           "Discover the history and architecture of Arad City Hall.",
-        clues: [
-          {
-            id: "primaria-clue-1",
-            title: "A Story in Stone",
-            description:
-              "I have witnessed generations pass by. My walls hold stories, and my architecture reflects another time. What am I?",
-            hint: "Think about the historic buildings in the heart of Arad.",
-            visualHints: [historyImage, historyImage, historyImage],
-          },
-          {
-            id: "primaria-clue-2",
-            title: "Echoes of the Past",
-            description:
-              "Culture, history and architecture meet within my walls. Many visitors have crossed my doors. Can you discover me?",
-            hint: "Think about a building connected to the cultural life of Arad.",
-            visualHints: [historyImage, historyImage, historyImage],
-          },
-          {
-            id: "primaria-clue-3",
-            title: "The Final Historical Challenge",
-            description:
-              "Your journey through history is almost complete. Look for a place that tells the story of the region's past.",
-            hint: "Think beyond the city centre and consider the historic fortifications of the county.",
-            visualHints: [historyImage, historyImage, historyImage],
-          },
-        ],
       },
       {
         id: "teatrul-ioan-slavici",
         name: "Teatrul Clasic Ioan Slavici",
         points: 20,
         locationDescription: "Historical location description coming soon.",
-        clues: [
-          {
-            id: "teatrul-clue-1",
-            title: "Discover the Location",
-            description: "Historical riddle coming soon.",
-            hint: "Additional hint coming soon.",
-          },
-        ],
       },
       {
         id: "biserica-rosie",
         name: "Biserica Roșie Luterană",
         points: 20,
         locationDescription: "Historical location description coming soon.",
-        clues: [
-          {
-            id: "biserica-clue-1",
-            title: "Discover the Location",
-            description: "Historical riddle coming soon.",
-            hint: "Additional hint coming soon.",
-          },
-        ],
       },
       {
         id: "moise-nicoara",
         name: "Liceul Național Moise Nicoară",
         points: 30,
         locationDescription: "Historical location description coming soon.",
-        clues: [
-          {
-            id: "moise-clue-1",
-            title: "Discover the Location",
-            description: "Historical riddle coming soon.",
-            hint: "Additional hint coming soon.",
-          },
-        ],
       },
       {
         id: "palatul-cultural",
         name: "Palatul Cultural (Filarmonica)",
         points: 20,
         locationDescription: "Historical location description coming soon.",
-        clues: [
-          {
-            id: "palatul-clue-1",
-            title: "Discover the Location",
-            description: "Historical riddle coming soon.",
-            hint: "Additional hint coming soon.",
-          },
-        ],
       },
       {
         id: "vechiul-cazino",
         name: "Vechiul Cazino",
         points: 20,
         locationDescription: "Historical location description coming soon.",
-        clues: [
-          {
-            id: "cazino-clue-1",
-            title: "Discover the Location",
-            description: "Historical riddle coming soon.",
-            hint: "Additional hint coming soon.",
-          },
-        ],
       },
     ],
   },
@@ -223,21 +127,20 @@ function AdventureDetailsPage() {
 
   // Retrieve the selected adventure.
   const adventure = adventureData[adventureId];
+  // Build the ordered route once per adventure, so its reference stays stable between renders.
   // Route IDs will be provided by the backend.
-
   // TODO: Replace this fallback with the saved route IDs from FastAPI.
   // Never generate a new random route on every render or refresh.
-  const routeIds = adventure?.locations.map((location) => location.id) ?? [];
+  const gameplayAdventure = useMemo(() => {
+    if (!adventure) return null;
 
-  // Build the ordered locations from the route identifiers.
-  const orderedLocations = adventure
-    ? getOrderedLocations(adventure.locations, routeIds)
-    : [];
+    const routeIds = adventure.locations.map((location) => location.id);
 
-  // Use the ordered route throughout the gameplay.
-  const gameplayAdventure = adventure
-    ? { ...adventure, locations: orderedLocations }
-    : null;
+    return {
+      ...adventure,
+      locations: getOrderedLocations(adventure.locations, routeIds),
+    };
+  }, [adventure]);
 
   // Sidebar state.
   const [menuOpen, setMenuOpen] = useState(false);
@@ -250,15 +153,21 @@ function AdventureDetailsPage() {
     setShowOverview(false);
   };
 
-  // Track the current location and clue separately.
+  // Track the current location. Each location has one riddle.
   const [currentLocationIndex, setCurrentLocationIndex] = useState(0);
 
-  const [currentClueIndex, setCurrentClueIndex] = useState(0);
-
-  // Locations the player completed (saved on the server) and hints.
+  // Locations the player completed (saved on the server).
   const [completedLocations, setCompletedLocations] = useState([]);
 
-  const [hintVisible, setHintVisible] = useState(false);
+  // Riddle and opened hints, stored with their location ID so they are never shown for another location.
+  const [missionState, setMissionState] = useState(null);
+
+  // True while the next hint is being opened.
+  const [isOpeningHint, setIsOpeningHint] = useState(false);
+
+  // The location the player is on now (null when the adventure is unknown).
+  const activeLocationId =
+    gameplayAdventure?.locations[currentLocationIndex]?.id ?? null;
 
   // Visual hint gallery.
   const [visualHintOpen, setVisualHintOpen] = useState(false);
@@ -277,19 +186,25 @@ function AdventureDetailsPage() {
 
   const [isValidating, setIsValidating] = useState(false);
 
+  // Reset the answer and hint state when the player opens a different adventure.
+  // This runs during render instead of in an effect, so no stale state is shown.
+  const [loadedAdventureId, setLoadedAdventureId] = useState(adventureId);
+
+  if (loadedAdventureId !== adventureId) {
+    setLoadedAdventureId(adventureId);
+    setAnswer("");
+    setValidationMessage("");
+    setValidationType("");
+    setVisualHintOpen(false);
+    setVisualHintIndex(0);
+  }
+
   /**
    * Load the player's saved progress from the server.
    * The first location that is not completed becomes the current one.
    */
   useEffect(() => {
     let isCancelled = false;
-
-    setAnswer("");
-    setValidationMessage("");
-    setValidationType("");
-    setHintVisible(false);
-    setVisualHintOpen(false);
-    setVisualHintIndex(0);
 
     const loadProgress = async () => {
       try {
@@ -304,7 +219,6 @@ function AdventureDetailsPage() {
 
         setCompletedLocations(data.completedLocations);
         setCurrentLocationIndex(firstOpen === -1 ? locations.length : firstOpen);
-        setCurrentClueIndex(0);
       } catch (error) {
         if (isCancelled) return;
 
@@ -318,36 +232,36 @@ function AdventureDetailsPage() {
     return () => {
       isCancelled = true;
     };
-  }, [adventureId]);
+  }, [adventureId, gameplayAdventure?.locations]);
 
   /**
-   * Clear the player's progress on this adventure. The server takes back the points it gave.
+   * Load the riddle and the opened hints for the active location.
+   * Runs again when the player moves to another location.
    */
-  const handleResetProgress = async () => {
-    const confirmReset = window.confirm(
-      "Are you sure you want to reset your progress? All completed clues will be lost.",
-    );
+  useEffect(() => {
+    if (!activeLocationId) return;
 
-    if (!confirmReset) return;
+    let isCancelled = false;
 
-    try {
-      await resetAdventureProgress(adventureId);
-    } catch (error) {
-      setValidationType("error");
-      setValidationMessage(error.message || "Unable to reset your progress.");
-      return;
-    }
+    getMission(activeLocationId)
+      .then((data) => {
+        if (!isCancelled) {
+          setMissionState({ locationId: activeLocationId, data });
+        }
+      })
+      .catch((error) => {
+        if (!isCancelled) {
+          setMissionState({
+            locationId: activeLocationId,
+            error: error.message || "Unable to load this location.",
+          });
+        }
+      });
 
-    setCompletedLocations([]);
-    setCurrentLocationIndex(0);
-    setCurrentClueIndex(0);
-    setAnswer("");
-    setValidationMessage("");
-    setValidationType("");
-    setHintVisible(false);
-    setVisualHintOpen(false);
-    setVisualHintIndex(0);
-  };
+    return () => {
+      isCancelled = true;
+    };
+  }, [activeLocationId]);
 
   // Close the visual hint modal when Escape is pressed.
   useEffect(() => {
@@ -377,33 +291,73 @@ function AdventureDetailsPage() {
     );
   }
 
-  // Calculate the total number of clues in the active route.
-  const totalClues = gameplayAdventure.locations.reduce(
-    (sum, location) => sum + location.clues.length,
-    0,
-  );
-  // Clues of the locations the player has completed.
-  const completedClues = gameplayAdventure.locations
-    .filter((location) => completedLocations.includes(location.id))
-    .reduce((sum, location) => sum + location.clues.length, 0);
+  // Count locations: the player solves one riddle per location.
+  const totalLocations = gameplayAdventure.locations.length;
+
+  // Number of locations the player has completed.
+  const completedLocationCount = gameplayAdventure.locations.filter(
+    (location) => completedLocations.includes(location.id),
+  ).length;
 
   // Determine whether the adventure is completed.
-  const isCompleted = totalClues > 0 && completedClues >= totalClues;
+  const isCompleted =
+    totalLocations > 0 && completedLocationCount >= totalLocations;
 
   const activeLocation = gameplayAdventure.locations[currentLocationIndex];
-  // Retrieve the current clue within that location.
-  const activeClue = activeLocation?.clues[currentClueIndex];
 
-  // Retrieve visual hints for the active historical location.
-  // Nature adventures continue using their existing clue images.
+  // The riddle and hints belong to one location. Ignore them if they are for another one.
+  const mission =
+    missionState?.locationId === activeLocationId ? missionState.data : null;
+  const missionError =
+    missionState?.locationId === activeLocationId ? missionState.error : "";
+
+  // Retrieve visual hints for the active location.
+  // History locations use their photos; nature locations use their own images.
   const visualHintImages =
     adventureId === "history"
       ? historyImages[activeLocation?.id]?.clues || []
-      : activeClue?.visualHints || [];
+      : activeLocation?.visualHints || [];
 
-  // Show the written hint.
-  const handleShowHint = () => {
-    setHintVisible(true);
+  /**
+   * Open the next hint for the active location. It is optional and costs points,
+   * which the server takes from the total right away.
+   */
+  const handleNextHint = async () => {
+    if (!activeLocation || isOpeningHint) return;
+
+    setIsOpeningHint(true);
+    setValidationMessage("");
+    setValidationType("");
+
+    try {
+      const result = await requestNextHint(activeLocation.id);
+
+      // Add the new hint after the hints already open, so they stay in order.
+      setMissionState((previous) => {
+        if (previous?.locationId !== activeLocation.id || !previous.data) {
+          return previous;
+        }
+
+        return {
+          locationId: activeLocation.id,
+          data: {
+            ...previous.data,
+            hintsUsed: result.hintsUsed,
+            hints: [...previous.data.hints, result.hint],
+          },
+        };
+      });
+
+      setValidationType("warning");
+      setValidationMessage(
+        `${result.hintCost} points were taken from your total for this hint.`,
+      );
+    } catch (error) {
+      setValidationType("error");
+      setValidationMessage(error.message || "Unable to open the hint.");
+    } finally {
+      setIsOpeningHint(false);
+    }
   };
 
   // Open the visual hint gallery.
@@ -421,7 +375,7 @@ function AdventureDetailsPage() {
    * The next location opens only after the server confirms it.
    */
   const handleSubmitAnswer = async () => {
-    if (!activeClue || !activeLocation) return;
+    if (!activeLocation) return;
 
     if (!answer.trim()) {
       setValidationMessage("Please enter your answer.");
@@ -453,9 +407,7 @@ function AdventureDetailsPage() {
             : [...previous, activeLocation.id],
         );
         setCurrentLocationIndex(currentLocationIndex + 1);
-        setCurrentClueIndex(0);
         setAnswer("");
-        setHintVisible(false);
         setValidationType("success");
       } else {
         setValidationType(result.gpsValid ? "warning" : "error");
@@ -521,20 +473,20 @@ function AdventureDetailsPage() {
           <AdventureOverview
             adventure={adventure}
             onStart={handleStartAdventure}
-            hasProgress={completedClues > 0}
+            hasProgress={completedLocationCount > 0}
           />
         ) : (
           <AdventureGameplay
             adventure={gameplayAdventure}
-            totalClues={totalClues}
-            completedClues={completedClues}
+            totalLocations={totalLocations}
+            completedLocationCount={completedLocationCount}
             isCompleted={isCompleted}
             currentLocationIndex={currentLocationIndex}
-            currentClueIndex={currentClueIndex}
             activeLocation={activeLocation}
-            activeClue={activeClue}
-            hintVisible={hintVisible}
-            handleShowHint={handleShowHint}
+            mission={mission}
+            missionError={missionError}
+            isOpeningHint={isOpeningHint}
+            handleNextHint={handleNextHint}
             handleOpenVisualHints={handleOpenVisualHints}
             answer={answer}
             setAnswer={setAnswer}
@@ -542,7 +494,6 @@ function AdventureDetailsPage() {
             validationMessage={validationMessage}
             validationType={validationType}
             handleSubmitAnswer={handleSubmitAnswer}
-            handleResetProgress={handleResetProgress}
             chatOpen={chatOpen}
             setChatOpen={setChatOpen}
             onBackToAdventures={() => navigate("/adventures")}

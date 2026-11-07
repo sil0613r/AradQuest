@@ -8,3 +8,7 @@
 # Passwords and secret keys, kept apart from the non-secret .env files
 secrets.env
 secrets.*.env
+
+# Browser test packages and screenshots (created by scripts/local.sh test)
+tests/e2e/node_modules/
+tests/e2e/shots/

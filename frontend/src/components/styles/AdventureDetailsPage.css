@@ -1151,38 +1151,6 @@
     height: min(460px, 65vh);
   }
 }
-.reset-progress-button {
-  display: inline-flex;
-  align-items: center;
-  justify-content: center;
-  gap: 8px;
-
-  padding: 10px 18px;
-
-  background: #fff8ed;
-  color: #9b6b32;
-
-  border: 1px solid #d9b77a;
-  border-radius: 12px;
-
-  font-size: 14px;
-  font-weight: 600;
-
-  cursor: pointer;
-  transition: all 0.25s ease;
-}
-
-.reset-progress-button:hover {
-  background: #e8c98f;
-  color: #4b321d;
-  transform: translateY(-2px);
-}
-
-.reset-icon {
-  font-size: 18px;
-  font-weight: bold;
-}
-
 /* Answer check messages (AdventureDetailsPage.jsx) */
 .clue-validation-message.success {
   color: #3d713e;

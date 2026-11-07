@@ -301,32 +301,7 @@ WHERE NOT EXISTS (
 );
 
 -- ==========================================
--- 6. INDICII
--- ==========================================
-
-INSERT INTO indicii
-(mission_id, clue_text, clue_order)
-SELECT
-    m.mission_id,
-    v.clue_text,
-    v.clue_order
-FROM (
-    VALUES
-        ('Mesajul de la intrare',
-         'Priveste cu atentie deasupra intrarii principale.', 1),
-
-        ('Mesajul de la intrare',
-         'Cauta inscriptia de pe cladire.', 2),
-
-        ('Poetul din umbra scenei',
-         'Gandeste-te la personalitatile legate de teatrul din Arad.', 1)
-) AS v(mission_title, clue_text, clue_order)
-JOIN misiuni m
-    ON m.title = v.mission_title
-ON CONFLICT (mission_id, clue_order) DO NOTHING;
-
--- ==========================================
--- 7. RASPUNSURI CORECTE ACCEPTATE
+-- 6. RASPUNSURI CORECTE ACCEPTATE
 -- ==========================================
 
 INSERT INTO raspunsuri_corecte

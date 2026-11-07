@@ -1,6 +1,6 @@
 import { useEffect, useState } from "react";
 import Sidebar from "../layout/Sidebar";
-import { useAuth } from "../context/AuthContext.jsx";
+import { useAuth } from "../context/useAuth.js";
 import { getSettings, saveSettings, updateProfile } from "../services/authService.js";
 import "../styles/SettingsPage.css";
 

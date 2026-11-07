@@ -19,12 +19,12 @@ Baza de date stocheaza informatii despre:
 - Conturile si profilurile jucatorilor
 - Obiective turistice si coordonate GPS
 - Trasee tematice si ordinea obiectivelor
-- Misiuni, indicii si raspunsuri corecte
+- Misiuni si raspunsuri corecte
 - Progresul jucatorilor si raspunsurile trimise
 - Insigne disponibile si obtinute
 - Recompense disponibile si revendicate
 
-Baza de date contine 15 tabele functionale, organizate in patru categorii principale.
+Baza de date contine 14 tabele functionale, organizate in patru categorii principale.
 
 ---
 
@@ -40,7 +40,6 @@ Tabele incluse:
 - `obiective_turistice`
 - `ordine_obiective_traseu`
 - `misiuni`
-- `indicii`
 - `raspunsuri_corecte`
 
 ### 2.2. Jucatori si progres
@@ -148,23 +147,7 @@ Stocheaza misiunile asociate obiectivelor turistice.
 
 Coloana `description` contine textul misiunii prezentate jucatorului.
 
-### 3.5. indicii
-
-Stocheaza indiciile asociate misiunilor.
-
-**Primary Key:**
-- `clue_id`
-
-**Foreign Key:**
-- `mission_id` -> `misiuni.mission_id`
-
-**Important columns:**
-- `clue_text`
-- `clue_order`
-
-Coloana `clue_order` stabileste ordinea in care sunt afisate indiciile.
-
-### 3.6. raspunsuri_corecte
+### 3.5. raspunsuri_corecte
 
 Stocheaza raspunsurile acceptate pentru fiecare misiune.
 
@@ -363,7 +346,6 @@ Generarea unei ordini aleatorii individuale pentru fiecare jucator reprezinta o 
 ### Relatii de tip unu-la-mai-multi (1:N)
 
 - `obiective_turistice` -> `misiuni`
-- `misiuni` -> `indicii`
 - `misiuni` -> `raspunsuri_corecte`
 
 ### Relatii de tip multi-la-multi (M:N)
@@ -409,7 +391,6 @@ Au fost verificate urmatoarele reguli de unicitate:
 | `clase_jucatori` | `class_name` | Numele claselor trebuie sa fie unice. |
 | `jucatori` | `username` | Fiecare nume de utilizator trebuie sa fie unic. |
 | `jucatori` | `email` | Fiecare adresa de email trebuie sa fie unica. |
-| `indicii` | `(mission_id, clue_order)` | Ordinea indiciilor trebuie sa fie unica in cadrul fiecarei misiuni. |
 | `insigne_disponibile` | `name` | Numele insignelor trebuie sa fie unice. |
 | `ordine_obiective_traseu` | `(route_id, sequence_number)` | Fiecare pozitie dintr-un traseu poate fi ocupata de un singur obiectiv. |
 
@@ -530,7 +511,7 @@ Acestea permit verificarea urmatoarelor informatii:
 - Afisarea profilurilor jucatorilor.
 - Afisarea obiectivelor turistice si a coordonatelor GPS.
 - Afisarea traseelor tematice.
-- Afisarea misiunilor si a indiciilor.
+- Afisarea misiunilor.
 - Verificarea progresului jucatorilor.
 - Afisarea insignelor obtinute.
 - Afisarea recompenselor disponibile.

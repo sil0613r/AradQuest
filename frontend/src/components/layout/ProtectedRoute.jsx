@@ -1,6 +1,6 @@
 import { Navigate } from "react-router-dom";
 
-import { useAuth } from "../context/AuthContext.jsx";
+import { useAuth } from "../context/useAuth.js";
 
 // Opens the page only for a logged-in user. Waits for the session check before deciding.
 function ProtectedRoute({ children }) {

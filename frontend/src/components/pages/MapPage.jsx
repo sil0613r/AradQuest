@@ -9,8 +9,6 @@ import "../styles/MapPage.css";
 
 import Sidebar from "../layout/Sidebar.jsx";
 
-import natureImage from "../../assets/images/backgrounds/nature-adventure.JPG";
-import historyImage from "../../assets/images/backgrounds/history-adventure.JPG";
 import { demoObjectives } from "../data/objectives.js";
 
 // --------------------------------------------------
@@ -65,75 +63,6 @@ function MapRecenter({ position }) {
 }
 
 // --------------------------------------------------
-// DISTANCE CALCULATION
-// Haversine formula calculates distance between GPS points.
-// --------------------------------------------------
-
-function calculateDistance(first, second) {
-  const earthRadius = 6371000;
-
-  const toRadians = (degrees) => (degrees * Math.PI) / 180;
-
-  const latitudeDifference = toRadians(second.latitude - first.latitude);
-  const longitudeDifference = toRadians(second.longitude - first.longitude);
-
-  const a =
-    Math.sin(latitudeDifference / 2) ** 2 +
-    Math.cos(toRadians(first.latitude)) *
-      Math.cos(toRadians(second.latitude)) *
-      Math.sin(longitudeDifference / 2) ** 2;
-
-  const c = 2 * Math.atan2(Math.sqrt(a), Math.sqrt(1 - a));
-
-  return earthRadius * c;
-}
-
-/**
- * Maximum allowed distance between the player
- * and any tourist attraction, in meters.
- */
-const MAX_ALLOWED_DISTANCE = 50;
-
-/**
- * Checks whether the player is within 50 meters
- * of the target tourist attraction.
- *
- * @param {number[] | null} userPosition - Player's GPS coordinates.
- * @param {Object} objective - Target tourist attraction.
- * @returns {Object} Validation result and distance in meters.
- */
-function checkObjectiveRadius(userPosition, objective) {
-  // Reject validation if the player's location or objective is missing.
-  if (!userPosition || !objective) {
-    return {
-      allowed: false,
-      distance: null,
-    };
-  }
-
-  // Convert the player's GPS position into latitude and longitude.
-  const userCoordinates = {
-    latitude: userPosition[0],
-    longitude: userPosition[1],
-  };
-
-  // Retrieve the target attraction's geographical coordinates.
-  const objectiveCoordinates = {
-    latitude: objective.latitude,
-    longitude: objective.longitude,
-  };
-
-  // Calculate the distance between the player and the attraction.
-  const distance = calculateDistance(userCoordinates, objectiveCoordinates);
-
-  // Allow validation only when the player is within 50 meters.
-  return {
-    allowed: distance <= MAX_ALLOWED_DISTANCE,
-    distance: Math.round(distance),
-  };
-}
-
-// --------------------------------------------------
 // MAIN COMPONENT / MAIN STATES
 // --------------------------------------------------
 
@@ -143,27 +72,15 @@ function MapPage() {
   const [activeAdventure, setActiveAdventure] = useState("nature");
   const [userPosition, setUserPosition] = useState(null);
 
-  const [gpsTracking, setGpsTracking] = useState(false);
-  const [gpsError, setGpsError] = useState("");
-
-  const [discoveryProgress, setDiscoveryProgress] = useState({});
+  // Load the saved progress once, when the page opens.
+  const [discoveryProgress, setDiscoveryProgress] = useState(() =>
+    JSON.parse(localStorage.getItem("adventureProgress") || "{}"),
+  );
   const [showFinalDiscovery, setShowFinalDiscovery] = useState(false);
   const [arModalOpen, setArModalOpen] = useState(false);
 
   const watchIdRef = useRef(null);
   const lastFinalDiscoveryRef = useRef(null); //we'll use it to start and stop the gps tracking when the user completes the adventure, so we don't show the final discovery modal multiple times
-
-  // --------------------------------------------------
-  // LOAD SAVED PROGRESS
-  // --------------------------------------------------
-
-  useEffect(() => {
-    const savedProgress = JSON.parse(
-      localStorage.getItem("adventureProgress") || "{}",
-    );
-
-    setDiscoveryProgress(savedProgress);
-  }, []);
 
   // Display only the objectives confirmed as completed.
   // The backend will eventually provide completedLocationIds.
@@ -212,45 +129,18 @@ function MapPage() {
     localStorage.setItem("adventureProgress", JSON.stringify(updatedProgress));
   };
 
-  //You can reset the progress after you complete the adventure, this is useful for testing purposes. In a real application, you might want to remove this or make it accessible only to admins or developers.
-  const handleResetProgress = () => {
-    const confirmReset = window.confirm(
-      `Are you sure you want to reset the ${activeAdventure} adventure progress?`,
-    );
-
-    if (!confirmReset) return;
-
-    const updatedProgress = {
-      ...discoveryProgress,
-      [activeAdventure]: {
-        completedClues: 0,
-      },
-    };
-
-    setDiscoveryProgress(updatedProgress);
-
-    localStorage.setItem("adventureProgress", JSON.stringify(updatedProgress));
-
-    setShowFinalDiscovery(false);
-    lastFinalDiscoveryRef.current = null;
-  };
-
   // --------------------------------------------------
   // GPS TRACKING
   // --------------------------------------------------
 
   const handleStartGPS = () => {
     if (!navigator.geolocation) {
-      setGpsError("Geolocation is not supported by your browser.");
       return;
     }
 
     if (watchIdRef.current !== null) {
       return;
     }
-
-    setGpsError("");
-    setGpsTracking(true);
 
     watchIdRef.current = navigator.geolocation.watchPosition(
       (position) => {
@@ -263,15 +153,7 @@ function MapPage() {
         setUserPosition([currentLatitude, currentLongitude]);
       },
 
-      (error) => {
-        setGpsError(
-          error.code === 1
-            ? "Location permission was denied."
-            : "Unable to retrieve your location.",
-        );
-
-        setGpsTracking(false);
-
+      () => {
         if (watchIdRef.current !== null) {
           navigator.geolocation.clearWatch(watchIdRef.current);
           watchIdRef.current = null;
@@ -283,15 +165,6 @@ function MapPage() {
         timeout: 15000,
       },
     );
-  };
-
-  const handleStopGPS = () => {
-    if (watchIdRef.current !== null) {
-      navigator.geolocation.clearWatch(watchIdRef.current);
-      watchIdRef.current = null;
-    }
-
-    setGpsTracking(false);
   };
 
   // Stop GPS tracking when leaving the page.
@@ -570,14 +443,6 @@ function MapPage() {
               {isAdventureCompleted
                 ? "🏆 Adventure Completed"
                 : "🔓 Complete Clue"}
-            </button>
-
-            {/* Reset Progress BUtton */}
-            <button
-              className="map-reset-progress-button"
-              onClick={handleResetProgress}
-            >
-              ↻ Reset Progress
             </button>
 
             {/* GPS DISTANCE */}

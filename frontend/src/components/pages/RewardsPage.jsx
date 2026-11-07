@@ -19,7 +19,7 @@ function RewardsPage() {
   const [selectedVoucher, setSelectedVoucher] = useState(null);
 
   // Temporary demo data. Later, these values will come from the backend.
-  const [points, setPoints] = useState(250);
+  const [points] = useState(250);
 
   const [availableRewards] = useState([
     {
@@ -79,7 +79,7 @@ function RewardsPage() {
     },
   ]);
 
-  const [claimedRewards, setClaimedRewards] = useState([]);
+  const [claimedRewards] = useState([]);
 
   // Open the details modal for the selected reward.
   // This does not deduct XP or create a real voucher.
@@ -199,9 +199,6 @@ function RewardsPage() {
           {availableRewards.length > 0 ? (
             <div className="rewards-grid">
               {availableRewards.map((reward) => {
-                // Demo previews are available regardless of the user's XP balance.
-                const canRedeem = true;
-
                 return (
                   <article
                     className={`rewards-card reward-${reward.color}`}

@@ -12,23 +12,23 @@ import Sidebar from "../layout/Sidebar.jsx";
 import natureImage from "../../assets/images/backgrounds/nature-adventure.JPG";
 import historyImage from "../../assets/images/backgrounds/history-adventure.JPG";
 
-// Total clues of an adventure, from its locations.
-function clueCount(adventureId) {
-  return ADVENTURE_LOCATIONS[adventureId].reduce((sum, location) => sum + location.clues, 0);
+// Number of locations (riddles) in an adventure.
+function locationCount(adventureId) {
+  return ADVENTURE_LOCATIONS[adventureId].length;
 }
 
-// Turn the completed location IDs from the server into { adventureId: { completedClues, status } }.
+// Turn the completed location IDs from the server into { adventureId: { completedCount, status } }.
 function progressFromServer(completedLocations) {
   const result = {};
 
-  for (const [adventureId, locations] of Object.entries(ADVENTURE_LOCATIONS)) {
-    const done = locations.filter((location) => completedLocations.includes(location.id));
+  for (const [adventureId, locationIds] of Object.entries(ADVENTURE_LOCATIONS)) {
+    const done = locationIds.filter((id) => completedLocations.includes(id));
 
     if (done.length === 0) continue;
 
     result[adventureId] = {
-      completedClues: done.reduce((sum, location) => sum + location.clues, 0),
-      status: done.length === locations.length ? "completed" : "in-progress",
+      completedCount: done.length,
+      status: done.length === locationIds.length ? "completed" : "in-progress",
     };
   }
 
@@ -46,7 +46,7 @@ const adventures = [
     icon: "🌿",
     points: 750,
     difficulty: "Medium",
-    clues: clueCount("nature"),
+    totalLocations: locationCount("nature"),
   },
   {
     id: "history",
@@ -58,7 +58,7 @@ const adventures = [
     icon: "🏛️",
     points: 750,
     difficulty: "Medium",
-    clues: clueCount("history"),
+    totalLocations: locationCount("history"),
   },
 ];
 
@@ -85,18 +85,18 @@ function AdventuresPage() {
   }, []);
 
   // Calculate total progress
-  const totalClues = adventures.reduce(
-    (total, adventure) => total + adventure.clues,
+  const totalLocations = adventures.reduce(
+    (total, adventure) => total + adventure.totalLocations,
     0,
   );
 
-  const completedClues = adventures.reduce(
-    (total, adventure) => total + (progress[adventure.id]?.completedClues || 0),
+  const completedCount = adventures.reduce(
+    (total, adventure) => total + (progress[adventure.id]?.completedCount || 0),
     0,
   );
 
   const progressPercentage =
-    totalClues > 0 ? Math.round((completedClues / totalClues) * 100) : 0;
+    totalLocations > 0 ? Math.round((completedCount / totalLocations) * 100) : 0;
 
   // Find an adventure currently in progress
   const ongoingAdventure = adventures.find(
@@ -158,7 +158,7 @@ function AdventuresPage() {
             <div>
               <strong>Overall Progress</strong>
               <p>
-                {completedClues}/{totalClues} clues solved
+                {completedCount}/{totalLocations} locations solved
               </p>
             </div>
           </div>
@@ -191,9 +191,9 @@ function AdventuresPage() {
                       className="adventures-progress-bar-fill"
                       style={{
                         width: `${
-                          ((progress[ongoingAdventure.id]?.completedClues ||
+                          ((progress[ongoingAdventure.id]?.completedCount ||
                             0) /
-                            ongoingAdventure.clues) *
+                            ongoingAdventure.totalLocations) *
                           100
                         }%`,
                       }}
@@ -201,8 +201,8 @@ function AdventuresPage() {
                   </div>
 
                   <span>
-                    {progress[ongoingAdventure.id]?.completedClues || 0}/
-                    {ongoingAdventure.clues} clues
+                    {progress[ongoingAdventure.id]?.completedCount || 0}/
+                    {ongoingAdventure.totalLocations} locations
                   </span>
                 </div>
 
@@ -240,7 +240,7 @@ function AdventuresPage() {
 
           <div className="adventures-cards-grid">
             {adventures.map((adventure) => {
-              const completed = progress[adventure.id]?.completedClues || 0;
+              const completed = progress[adventure.id]?.completedCount || 0;
               const status = getAdventureStatus(adventure.id);
 
               return (
@@ -281,7 +281,7 @@ function AdventuresPage() {
 
                     <div className="adventures-card-details">
                       <span>⭐ {adventure.points} pts</span>
-                      <span>🧩 {adventure.clues} clues</span>
+                      <span>🧩 {adventure.totalLocations} locations</span>
                       <span>◷ {adventure.difficulty}</span>
                     </div>
 
@@ -289,7 +289,7 @@ function AdventuresPage() {
                       <div className="adventures-card-progress-label">
                         <span>Your progress</span>
                         <strong>
-                          {completed}/{adventure.clues}
+                          {completed}/{adventure.totalLocations}
                         </strong>
                       </div>
 
@@ -297,7 +297,7 @@ function AdventuresPage() {
                         <div
                           className="adventures-progress-bar-fill"
                           style={{
-                            width: `${(completed / adventure.clues) * 100}%`,
+                            width: `${(completed / adventure.totalLocations) * 100}%`,
                           }}
                         />
                       </div>
@@ -325,9 +325,9 @@ function AdventuresPage() {
           <div className="adventures-summary-item">
             <span className="adventures-summary-icon">🏆</span>
             <div>
-              <h3>Clues Solved</h3>
+              <h3>Locations Solved</h3>
               <strong>
-                {completedClues}/{totalClues}
+                {completedCount}/{totalLocations}
               </strong>
             </div>
           </div>

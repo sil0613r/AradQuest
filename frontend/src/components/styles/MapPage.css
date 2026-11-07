@@ -1152,35 +1152,3 @@
   cursor: not-allowed;
   box-shadow: none;
 }
-
-/* RESET PROGRESS BUTTON */
-
-.map-reset-progress-button {
-  width: 100%;
-  margin: 0 0 18px;
-  padding: 12px 20px;
-
-  border: 1px solid #e5b8b8;
-  border-radius: 14px;
-
-  background: #fff5f5;
-  color: #b84242;
-
-  font-size: 13px;
-  font-weight: 700;
-
-  cursor: pointer;
-
-  transition:
-    background 0.2s ease,
-    transform 0.2s ease;
-}
-
-.map-reset-progress-button:hover {
-  background: #ffe5e5;
-  transform: translateY(-1px);
-}
-
-.map-reset-progress-button:active {
-  transform: translateY(0);
-}

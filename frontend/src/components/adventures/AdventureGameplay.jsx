@@ -1,19 +1,19 @@
 import QuestAssistant from "./QuestAssistant.jsx";
 import { CHATBOT_MISSION_BY_LOCATION } from "../data/chatbotMissions.js";
 
-// Displays the adventure progress, current clue, hints and AI chat UI.
+// Displays the adventure progress, the current riddle, optional paid hints and AI chat UI.
 // GPS and answer verification remain controlled by the parent page.
 export default function AdventureGameplay({
   adventure,
-  totalClues,
-  completedClues,
+  totalLocations,
+  completedLocationCount,
   isCompleted,
   currentLocationIndex,
-  currentClueIndex,
   activeLocation,
-  activeClue,
-  hintVisible,
-  handleShowHint,
+  mission,
+  missionError,
+  isOpeningHint,
+  handleNextHint,
   handleOpenVisualHints,
   answer,
   setAnswer,
@@ -21,7 +21,6 @@ export default function AdventureGameplay({
   validationMessage,
   validationType,
   handleSubmitAnswer,
-  handleResetProgress,
   chatOpen,
   setChatOpen,
   onBackToAdventures,
@@ -38,11 +37,11 @@ export default function AdventureGameplay({
           <div>
             <h2>Your Journey</h2>
 
-            <p>Every clue brings you closer to the final discovery.</p>
+            <p>Every location brings you closer to the final discovery.</p>
           </div>
 
           <strong>
-            {completedClues}/{totalClues} clues solved
+            {completedLocationCount}/{totalLocations} locations solved
           </strong>
         </div>
 
@@ -53,23 +52,13 @@ export default function AdventureGameplay({
             className="progress-bar-fill"
             style={{
               width:
-                totalClues > 0
-                  ? `${(completedClues / totalClues) * 100}%`
+                totalLocations > 0
+                  ? `${(completedLocationCount / totalLocations) * 100}%`
                   : "0%",
             }}
           />
         </div>
 
-        {/* Reset progress */}
-
-        <button
-          className="reset-progress-button"
-          onClick={handleResetProgress}
-          type="button"
-        >
-          <span className="reset-icon">↻</span>
-          Reset Progress
-        </button>
       </section>
 
       {/* Clue area */}
@@ -82,14 +71,14 @@ export default function AdventureGameplay({
             <h2>Adventure Completed!</h2>
 
             <p>
-              Congratulations! You have solved all the clues in this adventure.
+              Congratulations! You have solved the riddles of every location in this adventure.
             </p>
 
             <button type="button" onClick={onBackToAdventures}>
               Back to My Adventures
             </button>
           </div>
-        ) : activeLocation && activeClue ? (
+        ) : activeLocation ? (
           <>
             {/* Fixed location description */}
 
@@ -99,51 +88,71 @@ export default function AdventureGameplay({
               <p>{activeLocation.locationDescription}</p>
             </div>
 
-            {/* Current location and clue number */}
+            {/* Current location number */}
 
             <div className="clue-number">
               <span>🧩</span>
               LOCATION {currentLocationIndex + 1} OF{" "}
               {adventure.locations.length}
-              {" — "}
-              CLUE {currentClueIndex + 1} OF {activeLocation.clues.length}
             </div>
 
-            {/* Current clue title */}
-
-            <h2>{activeClue.title}</h2>
+            <h2>Solve the riddle</h2>
 
             <p className="clue-introduction">
               Read carefully. Every detail might help you discover your next
               destination.
             </p>
 
-            {/* Main clue */}
+            {/* Riddle of this location, from the server */}
 
-            <div className="clue-card">
-              <span className="clue-decoration">❝</span>
+            {mission ? (
+              <div className="clue-card">
+                <span className="clue-decoration">❝</span>
 
-              <p>{activeClue.description}</p>
-            </div>
+                <p>{mission.description}</p>
+              </div>
+            ) : (
+              <p className="clue-introduction">
+                {missionError || "Loading the riddle..."}
+              </p>
+            )}
 
-            {/* Written hint */}
+            {/* Optional hints: opened one by one, in order. Each one costs points. */}
 
             <div className="hint-container">
-              {!hintVisible ? (
+              {mission?.hints.length > 0 && (
+                <div className="hint-message">
+                  <strong>Hints you opened:</strong>
+
+                  <ol>
+                    {mission.hints.map((hint, index) => (
+                      <li key={index}>{hint}</li>
+                    ))}
+                  </ol>
+                </div>
+              )}
+
+              {mission && mission.hintsUsed < mission.clueCount && (
                 <button
                   className="hint-button"
                   type="button"
-                  onClick={handleShowHint}
+                  onClick={handleNextHint}
+                  disabled={isOpeningHint}
                 >
-                  💡 Need a hint?
+                  💡{" "}
+                  {isOpeningHint
+                    ? "Opening hint..."
+                    : `Open next hint (-${mission.hintCost} points)`}
                 </button>
-              ) : (
-                <div className="hint-message">
-                  <strong>Here's a little help:</strong>
-
-                  <p>{activeClue.hint}</p>
-                </div>
               )}
+
+              {mission &&
+                mission.clueCount > 0 &&
+                mission.hintsUsed >= mission.clueCount && (
+                  <p className="clue-introduction">
+                    All hints for this location are open.
+                  </p>
+                )}
             </div>
 
             {/* Visual hints */}
@@ -222,7 +231,7 @@ export default function AdventureGameplay({
             </div>
           </>
         ) : (
-          <p>Unable to load the current clue.</p>
+          <p>Unable to load the current location.</p>
         )}
       </section>
 

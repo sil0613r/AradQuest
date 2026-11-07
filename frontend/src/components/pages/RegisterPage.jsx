@@ -4,7 +4,7 @@ import { Link, useNavigate } from "react-router-dom";
 import aradQuestLogo from "../../assets/images/backgrounds/aradquest-logo.png";
 import "../styles/RegisterPage.css";
 import { registerUser, loginUser } from "../services/authService";
-import { useAuth } from "../context/AuthContext";
+import { useAuth } from "../context/useAuth.js";
 
 function RegisterPage() {
   const navigate = useNavigate();

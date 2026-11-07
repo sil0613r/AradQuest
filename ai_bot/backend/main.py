@@ -1,10 +1,11 @@
 """FastAPI app: two endpoints for the chat widget. Run with: uvicorn main:app --reload"""
+import hmac
 import logging
 import time
 import uuid
 from collections import defaultdict, deque
 
-from fastapi import FastAPI, HTTPException, Request
+from fastapi import FastAPI, Header, HTTPException, Request
 from fastapi.middleware.cors import CORSMiddleware
 from pydantic import BaseModel, Field
 
@@ -62,6 +63,18 @@ def check_rate(request: Request) -> None:
 @app.get("/health")
 def health():
     return {"ok": True}
+
+
+@app.get("/internal/missions/{mission_key}")
+def internal_mission(mission_key: str, x_internal_token: str | None = Header(default=None)):
+    """Mission text and the hint list, for the game API only (it charges points per hint).
+    Off unless INTERNAL_TOKEN is set. Browsers never get the hint list from here."""
+    if not settings.INTERNAL_TOKEN or not hmac.compare_digest(x_internal_token or "", settings.INTERNAL_TOKEN):
+        raise HTTPException(404, "Not found")
+    if mission_key not in MISSIONS:
+        raise HTTPException(404, "Unknown mission")
+    mission, _ = MISSIONS[mission_key]
+    return {"title": mission.title, "description": mission.description, "clues": mission.clues}
 
 
 @app.post("/api/bot/start", response_model=StartResponse)

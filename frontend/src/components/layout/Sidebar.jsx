@@ -2,7 +2,7 @@ import { useState } from "react";
 import { useNavigate } from "react-router-dom";
 import logo from "../../assets/images/backgrounds/aradquest-logo.png";
 import "../styles/Sidebar.css";
-import { useAuth } from "../context/AuthContext.jsx";
+import { useAuth } from "../context/useAuth.js";
 
 // Navigation items — păstrăm emoji-urile colorate din MapPage
 const navigationItems = [
