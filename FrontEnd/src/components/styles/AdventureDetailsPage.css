@@ -1041,6 +1041,9 @@
   overflow-y: auto;
   padding: 20px;
   background: #fffaf1;
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
 }
 
 .ai-chat-message {
@@ -1056,6 +1059,18 @@
 
 .ai-chat-message p {
   margin: 0;
+}
+
+.ai-chat-message--user {
+  align-self: flex-end;
+  border-color: #dcb04f;
+  border-radius: 14px 14px 3px 14px;
+  background: #dcb04f;
+  color: #fff;
+}
+
+.ai-chat-message--pending {
+  opacity: 0.6;
 }
 
 /* Input */

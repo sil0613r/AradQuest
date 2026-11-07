@@ -1,4 +1,5 @@
-import aradQuestAiLogo from "../../assets/images/aradquest-aiLogo.png";
+import QuestAssistant from "./QuestAssistant.jsx";
+import { CHATBOT_MISSION_BY_LOCATION } from "../data/chatbotMissions.js";
 
 // Displays the adventure progress, current clue, hints and AI chat UI.
 // GPS and answer verification remain controlled by the parent page.
@@ -25,6 +26,9 @@ export default function AdventureGameplay({
   setChatOpen,
   onBackToAdventures,
 }) {
+  // The Quest Assistant follows the location the player is on.
+  const chatMissionId = CHATBOT_MISSION_BY_LOCATION[activeLocation?.id] ?? null;
+
   return (
     <>
       {/* Adventure progress */}
@@ -222,77 +226,14 @@ export default function AdventureGameplay({
         )}
       </section>
 
-      {/* Floating AI Chatbot */}
+      {/* Floating AI Chatbot, one fresh chat per location */}
 
-      <div className="floating-ai-chat">
-        {/* Chat window */}
-
-        {chatOpen && (
-          <div className="ai-chat-window">
-            <div className="ai-chat-header">
-              <div className="ai-chat-header-info">
-                <img
-                  src={aradQuestAiLogo}
-                  alt="Arad Quest AI"
-                  className="ai-chat-header-logo"
-                />
-
-                <div>
-                  <h3>Quest Assistant</h3>
-
-                  <span>Your adventure companion</span>
-                </div>
-              </div>
-
-              <button
-                className="ai-chat-close"
-                type="button"
-                onClick={() => setChatOpen(false)}
-                aria-label="Close chat"
-              >
-                ×
-              </button>
-            </div>
-
-            {/* Chat messages */}
-
-            <div className="ai-chat-messages">
-              <div className="ai-chat-message">
-                <p>
-                  Hi, explorer! 👋 I'm your Quest Assistant. Need some help
-                  solving your current clue?
-                </p>
-              </div>
-            </div>
-
-            {/* Chat input - not connected yet */}
-
-            <div className="ai-chat-input-area">
-              <input type="text" placeholder="Ask me something..." disabled />
-
-              <button
-                type="button"
-                disabled
-                aria-label="Send message"
-                title="AI assistant is not connected yet"
-              >
-                ➤
-              </button>
-            </div>
-          </div>
-        )}
-
-        {/* Floating AI logo button */}
-
-        <button
-          className="ai-chat-floating-button"
-          type="button"
-          onClick={() => setChatOpen((previous) => !previous)}
-          aria-label={chatOpen ? "Close AI chat" : "Open AI chat"}
-        >
-          <img src={aradQuestAiLogo} alt="AI Chatbot" />
-        </button>
-      </div>
+      <QuestAssistant
+        key={chatMissionId ?? "no-mission"}
+        missionId={chatMissionId}
+        chatOpen={chatOpen}
+        setChatOpen={setChatOpen}
+      />
 
       {/* Explorer tip */}
 
