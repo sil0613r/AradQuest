@@ -231,6 +231,35 @@ WHERE m.mission_id IS NULL
 ORDER BY ot.objective_id;
 
 
+-- 16. Verificarea punctajului misiunilor
+-- Fiecare dintre cele 11 misiuni ar trebui sa valoreze 40 de puncte.
+
+SELECT
+    COUNT(*) AS total_missions,
+    SUM(points_reward) AS total_possible_points,
+    MIN(points_reward) AS minimum_points,
+    MAX(points_reward) AS maximum_points
+FROM misiuni;
+
+
+-- 17. Afisarea recompenselor revendicate de jucatori
+
+SELECT
+    j.username,
+    r.name AS reward_name,
+    rr.points_spent,
+    rr.claimed_at,
+    rr.qr_code,
+    rr.status,
+    rr.redeemed_at
+FROM recompense_revendicate rr
+JOIN jucatori j
+    ON rr.player_id = j.player_id
+JOIN recompense_disponibile r
+    ON rr.reward_id = r.reward_id
+ORDER BY rr.claimed_at DESC;
+
+
 -- ==========================================
 -- SFARSITUL INTEROGARILOR DE TEST
 -- ==========================================
