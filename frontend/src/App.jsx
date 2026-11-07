@@ -13,6 +13,7 @@ import SettingsPage from "./components/pages/SettingsPage";
 import RewardsPage from "./components/pages/RewardsPage";
 import MapPage from "./components/pages/MapPage";
 import { AuthProvider } from "./components/context/AuthContext.jsx";
+import ProtectedRoute from "./components/layout/ProtectedRoute.jsx";
 
 function App() {
   return (
@@ -29,34 +30,38 @@ function App() {
           <Route path="/register" element={<RegisterPage />} />
 
           {/* AvatarSelectionPage */}
-          <Route path="/choose-avatar" element={<AvatarSelectionPage />} />
+          {/* Pages below need a logged-in user; logged-out visitors go to /login */}
+          <Route
+            path="/choose-avatar"
+            element={<ProtectedRoute><AvatarSelectionPage /></ProtectedRoute>}
+          />
 
           {/* HomePage */}
-          <Route path="/home" element={<HomePage />} />
+          <Route path="/home" element={<ProtectedRoute><HomePage /></ProtectedRoute>} />
 
           {/* AdventuresPage */}
-          <Route path="/adventures" element={<AdventuresPage />} />
+          <Route path="/adventures" element={<ProtectedRoute><AdventuresPage /></ProtectedRoute>} />
 
           {/* AdventureDetailsPage */}
           <Route
             path="/adventures/:adventureId"
-            element={<AdventureDetailsPage />}
+            element={<ProtectedRoute><AdventureDetailsPage /></ProtectedRoute>}
           />
 
           {/* ProfilePage */}
-          <Route path="/profile" element={<ProfilePage />} />
+          <Route path="/profile" element={<ProtectedRoute><ProfilePage /></ProtectedRoute>} />
 
-          {/* AboutPage */}
+          {/* AboutPage (public) */}
           <Route path="/about" element={<AboutPage />} />
 
           {/* SettingsPage */}
-          <Route path="/settings" element={<SettingsPage />} />
+          <Route path="/settings" element={<ProtectedRoute><SettingsPage /></ProtectedRoute>} />
 
           {/* RewardsPage */}
-          <Route path="/rewards" element={<RewardsPage />} />
+          <Route path="/rewards" element={<ProtectedRoute><RewardsPage /></ProtectedRoute>} />
 
           {/* MapPage */}
-          <Route path="/map" element={<MapPage />} />
+          <Route path="/map" element={<ProtectedRoute><MapPage /></ProtectedRoute>} />
         </Routes>
       </AuthProvider>
     </BrowserRouter>

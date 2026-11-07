@@ -4,6 +4,7 @@ import {
   mockGetCurrentUser,
   mockLogoutUser,
 } from "./mockAuthService.js";
+import { apiRequest } from "./apiClient.js";
 
 const API_URL = import.meta.env.VITE_API_URL;
 
@@ -131,4 +132,25 @@ export async function logoutUser() {
   if (!response.ok) {
     throw new Error("Unable to log out. Please try again.");
   }
+}
+
+// Change the logged-in player's username, email or avatar. Only the fields passed are changed.
+// Returns the updated user.
+export async function updateProfile(fields) {
+  const data = await apiRequest("/users/me", { method: "PATCH", body: fields });
+  return data.user;
+}
+
+// Notification settings of the logged-in player.
+export async function getSettings() {
+  const data = await apiRequest("/users/me/settings");
+  return data.settings;
+}
+
+export async function saveSettings(settings) {
+  const data = await apiRequest("/users/me/settings", {
+    method: "PUT",
+    body: settings,
+  });
+  return data.settings;
 }

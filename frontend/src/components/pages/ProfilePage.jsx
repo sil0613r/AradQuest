@@ -2,17 +2,30 @@ import { useState } from "react";
 import { useNavigate } from "react-router-dom";
 import "../styles/ProfilePage.css";
 import Sidebar from "../layout/Sidebar.jsx";
+import { useAuth } from "../context/AuthContext.jsx";
 
 // Arad Quest assets
 import explorerAvatar from "../../assets/images/avatars/explorer.png";
+import adventurerAvatar from "../../assets/images/avatars/adventurer.png";
+import championAvatar from "../../assets/images/avatars/champion.png";
+import pathfinderAvatar from "../../assets/images/avatars/pathfinder.png";
+
+const avatarImages = {
+  explorer: explorerAvatar,
+  adventurer: adventurerAvatar,
+  champion: championAvatar,
+  pathfinder: pathfinderAvatar,
+};
 
 function ProfilePage() {
   const navigate = useNavigate();
   const [menuOpen, setMenuOpen] = useState(false);
 
-  // Temporary profile data. Later, these values can come from the backend.
-  const username = "Explorer";
-  const email = "explorer@aradquest.com";
+  // The name and email come from the logged-in account.
+  const { user } = useAuth();
+  const username = user?.username || "Explorer";
+  const email = user?.email || "";
+  const avatarImage = avatarImages[user?.avatar] || explorerAvatar;
 
   const profileStats = [
     { icon: "⭐", value: "250", label: "Total Points" },
@@ -93,7 +106,7 @@ function ProfilePage() {
           <div className="profile-hero-overlay">
             <div className="profile-hero-avatar-wrapper">
               <img
-                src={explorerAvatar}
+                src={avatarImage}
                 alt={`${username} avatar`}
                 className="profile-hero-avatar"
               />

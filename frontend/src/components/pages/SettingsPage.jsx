@@ -1,5 +1,7 @@
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import Sidebar from "../layout/Sidebar";
+import { useAuth } from "../context/AuthContext.jsx";
+import { getSettings, saveSettings, updateProfile } from "../services/authService.js";
 import "../styles/SettingsPage.css";
 
 import explorerAvatar from "../../assets/images/avatars/explorer.png";
@@ -29,32 +31,41 @@ const avatarOptions = {
 function SettingsPage() {
   const [menuOpen, setMenuOpen] = useState(false);
 
-  // Retrieve current user
-  const storedUser = JSON.parse(localStorage.getItem("currentUser") || "{}");
+  // The name, email and avatar come from the logged-in account.
+  const { user, updateUser } = useAuth();
 
-  const selectedAvatar =
-    storedUser.avatar || localStorage.getItem("selectedAvatar") || "explorer";
+  const avatar = avatarOptions[user?.avatar] || avatarOptions.explorer;
 
-  const avatar = avatarOptions[selectedAvatar] || avatarOptions.explorer;
+  const [username, setUsername] = useState(user?.username || "Explorer");
 
-  const [username, setUsername] = useState(
-    storedUser.username || localStorage.getItem("username") || "Explorer",
-  );
+  const [email, setEmail] = useState(user?.email || "");
 
-  const [email, setEmail] = useState(storedUser.email || "");
-
-  // Notification settings
-  const savedSettings = JSON.parse(
-    localStorage.getItem("userSettings") || "{}",
-  );
-
+  // Notification switches. Defaults are used until the saved settings load.
   const [notifications, setNotifications] = useState({
-    adventureUpdates: savedSettings.adventureUpdates ?? true,
-    rewards: savedSettings.rewards ?? true,
-    announcements: savedSettings.announcements ?? false,
+    adventureUpdates: true,
+    rewards: true,
+    announcements: false,
   });
 
   const [saveMessage, setSaveMessage] = useState("");
+
+  const [saveFailed, setSaveFailed] = useState(false);
+
+  useEffect(() => {
+    let isCancelled = false;
+
+    getSettings()
+      .then((stored) => {
+        if (!isCancelled) setNotifications(stored);
+      })
+      .catch(() => {
+        // Keep the default switches if the settings cannot be loaded.
+      });
+
+    return () => {
+      isCancelled = true;
+    };
+  }, []);
 
   // Handle notification changes
   const handleNotificationChange = (name) => {
@@ -66,26 +77,22 @@ function SettingsPage() {
     setSaveMessage("");
   };
 
-  // Save account and notification settings
-  const handleSave = (event) => {
+  // Save the account details and notification switches on the server.
+  const handleSave = async (event) => {
     event.preventDefault();
 
-    const updatedSettings = {
-      ...notifications,
-    };
+    setSaveFailed(false);
+    setSaveMessage("");
 
-    localStorage.setItem("userSettings", JSON.stringify(updatedSettings));
-
-    const updatedUser = {
-      ...storedUser,
-      username,
-      email,
-    };
-
-    localStorage.setItem("currentUser", JSON.stringify(updatedUser));
-    localStorage.setItem("username", username);
-
-    setSaveMessage("Your settings have been saved successfully!");
+    try {
+      const updatedUser = await updateProfile({ username, email });
+      updateUser(updatedUser);
+      await saveSettings(notifications);
+      setSaveMessage("Your settings have been saved successfully!");
+    } catch (error) {
+      setSaveFailed(true);
+      setSaveMessage(error.message || "Unable to save your settings.");
+    }
   };
 
   return (
@@ -297,7 +304,11 @@ function SettingsPage() {
 
           {/* SAVE BUTTON */}
           <div className="settings-save-area">
-            {saveMessage && <p className="settings-success">✓ {saveMessage}</p>}
+            {saveMessage && (
+              <p className={saveFailed ? "settings-error" : "settings-success"}>
+                {saveFailed ? saveMessage : `✓ ${saveMessage}`}
+              </p>
+            )}
 
             <button type="submit" className="settings-save-button">
               Save Changes <span>→</span>

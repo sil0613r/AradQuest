@@ -1182,3 +1182,17 @@
   font-size: 18px;
   font-weight: bold;
 }
+
+/* Answer check messages (AdventureDetailsPage.jsx) */
+.clue-validation-message.success {
+  color: #3d713e;
+  font-weight: 700;
+}
+
+.clue-validation-message.warning {
+  color: #8a6a1f;
+}
+
+.clue-validation-message.error {
+  color: #b3261e;
+}

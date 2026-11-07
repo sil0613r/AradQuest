@@ -1,4 +1,4 @@
-// Client for the Quest Assistant (AI_bot/backend). Separate from authService.js,
+// Client for the Quest Assistant (ai_bot/backend). Separate from authService.js,
 // which talks to the game's own API.
 const CHATBOT_API_URL = import.meta.env.VITE_CHATBOT_API_URL;
 

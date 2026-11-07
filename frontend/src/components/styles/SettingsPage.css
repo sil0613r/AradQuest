@@ -339,6 +339,12 @@
   flex-wrap: wrap;
 }
 
+.settings-error {
+  color: #b3261e;
+  font-size: 13px;
+  font-weight: 700;
+}
+
 .settings-success {
   color: #3d713e;
   font-size: 13px;

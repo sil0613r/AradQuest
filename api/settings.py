@@ -1,9 +1,17 @@
-"""Settings read from environment variables (see .env.example)."""
+"""Settings read from environment variables.
+
+Non-secret values come from api/.env, passwords and the session secret from api/secrets.env.
+On Railway (or any host that sets real variables) those variables win over the files.
+"""
 import os
+from pathlib import Path
 
 from dotenv import load_dotenv
+from psycopg.conninfo import make_conninfo
 
-load_dotenv()   # reads api/.env when running locally; Railway sets real variables instead
+_HERE = Path(__file__).parent
+load_dotenv(_HERE / ".env")
+load_dotenv(_HERE / "secrets.env")
 
 
 def _required(name: str) -> str:
@@ -13,7 +21,22 @@ def _required(name: str) -> str:
     return value
 
 
-DATABASE_URL = _required("DATABASE_URL")          # postgresql://user:password@host:port/arad_quest
+def _database_conninfo() -> str:
+    # A full DATABASE_URL (Railway provides one) is used as-is. Otherwise build it from the DB_* parts,
+    # so the password is never written into a URL inside a config file.
+    url = os.getenv("DATABASE_URL", "").strip()
+    if url:
+        return url
+    return make_conninfo(
+        host=_required("DB_HOST"),
+        port=_required("DB_PORT"),
+        dbname=_required("DB_NAME"),
+        user=_required("DB_USER"),
+        password=_required("DB_PASSWORD"),
+    )
+
+
+DATABASE_CONNINFO = _database_conninfo()
 SESSION_SECRET = _required("SESSION_SECRET")      # long random string, signs the login cookie
 
 ALLOWED_ORIGINS = [o.strip() for o in os.getenv("ALLOWED_ORIGINS", "http://localhost:5173").split(",") if o.strip()]

@@ -6,7 +6,7 @@ import settings
 
 # Rows come back as dicts, e.g. row["username"]. The pool is opened in main.py's lifespan.
 pool = ConnectionPool(
-    conninfo=settings.DATABASE_URL,
+    conninfo=settings.DATABASE_CONNINFO,
     min_size=1,
     max_size=5,
     open=False,

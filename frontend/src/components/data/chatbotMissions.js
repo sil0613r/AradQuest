@@ -1,4 +1,4 @@
-// Maps each game location ID to its mission ID in AI_bot/backend/missions.json.
+// Maps each game location ID to its mission ID in ai_bot/backend/missions.json.
 // Locations without an entry have no Quest Assistant yet.
 export const CHATBOT_MISSION_BY_LOCATION = {
   // Nature Explorer

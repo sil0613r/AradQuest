@@ -6,6 +6,7 @@ import "../styles/AdventureDetailsPage.css";
 import Sidebar from "../layout/Sidebar.jsx";
 import { historyImages } from "../data/historyImages.js";
 import { getOrderedLocations } from "../utils/generateAdventureRoute.js";
+import { getCurrentPosition, getProgress, resetAdventureProgress, verifyLocationAnswer } from "../services/gameService.js";
 
 import AdventureOverview from "../adventures/AdventureOverview.jsx";
 import natureImage from "../../assets/images/backgrounds/nature-adventure.JPG";
@@ -254,8 +255,8 @@ function AdventureDetailsPage() {
 
   const [currentClueIndex, setCurrentClueIndex] = useState(0);
 
-  // Adventure progress and hints.
-  const [progress, setProgress] = useState({});
+  // Locations the player completed (saved on the server) and hints.
+  const [completedLocations, setCompletedLocations] = useState([]);
 
   const [hintVisible, setHintVisible] = useState(false);
 
@@ -277,113 +278,74 @@ function AdventureDetailsPage() {
   const [isValidating, setIsValidating] = useState(false);
 
   /**
-   * * Restore locally saved adventure progress.
-   * * This is temporary demo storage.
-   * * The backend will become the source of truth.
+   * Load the player's saved progress from the server.
+   * The first location that is not completed becomes the current one.
    */
-
   useEffect(() => {
-    let savedProgress = {};
-
-    try {
-      savedProgress = JSON.parse(
-        localStorage.getItem("adventureProgress") || "{}",
-      );
-    } catch {
-      savedProgress = {};
-    }
-
-    const savedAdventure = savedProgress[adventureId];
-
-    // Use the same location order as the gameplay.
-    const locations = gameplayAdventure?.locations || [];
-    const totalClues = gameplayAdventure.locations.reduce(
-      (sum, location) => sum + location.clues.length,
-      0,
-    );
-
-    const completed = Math.min(
-      Math.max(Number(savedAdventure?.completedClues) || 0, 0),
-
-      totalClues,
-    );
-
-    // Convert the completed clue count into
-    // the current location and clue indices.
-    let remaining = completed;
-
-    let locationIndex = locations.length;
-
-    let clueIndex = 0;
-
-    for (let index = 0; index < locations.length; index++) {
-      const clueCount = locations[index].clues.length;
-
-      if (remaining < clueCount) {
-        locationIndex = index;
-
-        clueIndex = remaining;
-
-        break;
-      }
-
-      remaining -= clueCount;
-    }
-
-    setProgress(savedProgress);
-
-    setCurrentLocationIndex(locationIndex);
-
-    setCurrentClueIndex(clueIndex);
+    let isCancelled = false;
 
     setAnswer("");
-
     setValidationMessage("");
-
     setValidationType("");
-
     setHintVisible(false);
-
     setVisualHintOpen(false);
-
     setVisualHintIndex(0);
+
+    const loadProgress = async () => {
+      try {
+        const data = await getProgress();
+
+        if (isCancelled) return;
+
+        const locations = gameplayAdventure?.locations || [];
+        const firstOpen = locations.findIndex(
+          (location) => !data.completedLocations.includes(location.id),
+        );
+
+        setCompletedLocations(data.completedLocations);
+        setCurrentLocationIndex(firstOpen === -1 ? locations.length : firstOpen);
+        setCurrentClueIndex(0);
+      } catch (error) {
+        if (isCancelled) return;
+
+        setValidationType("error");
+        setValidationMessage(error.message || "Unable to load your progress.");
+      }
+    };
+
+    loadProgress();
+
+    return () => {
+      isCancelled = true;
+    };
   }, [adventureId]);
 
   /**
-   * * Reset the locally stored demo progress.
-   * * Once backend persistence is implemented,
-   * * this function must use an authorized API.
+   * Clear the player's progress on this adventure. The server takes back the points it gave.
    */
-
-  const handleResetProgress = () => {
+  const handleResetProgress = async () => {
     const confirmReset = window.confirm(
       "Are you sure you want to reset your progress? All completed clues will be lost.",
     );
 
     if (!confirmReset) return;
 
-    const updatedProgress = { ...progress };
+    try {
+      await resetAdventureProgress(adventureId);
+    } catch (error) {
+      setValidationType("error");
+      setValidationMessage(error.message || "Unable to reset your progress.");
+      return;
+    }
 
-    delete updatedProgress[adventureId];
-
-    localStorage.setItem("adventureProgress", JSON.stringify(updatedProgress));
-
-    setProgress(updatedProgress);
-
+    setCompletedLocations([]);
     setCurrentLocationIndex(0);
-
     setCurrentClueIndex(0);
-
     setAnswer("");
-
     setValidationMessage("");
-
     setValidationType("");
-
     setHintVisible(false);
-
     setVisualHintOpen(false);
-
     setVisualHintIndex(0);
   };
 
@@ -420,12 +382,10 @@ function AdventureDetailsPage() {
     (sum, location) => sum + location.clues.length,
     0,
   );
-  // Read the locally saved number of completed clues.
-  const completedClues = Math.min(
-    Math.max(Number(progress[adventureId]?.completedClues) || 0, 0),
-
-    totalClues,
-  );
+  // Clues of the locations the player has completed.
+  const completedClues = gameplayAdventure.locations
+    .filter((location) => completedLocations.includes(location.id))
+    .reduce((sum, location) => sum + location.clues.length, 0);
 
   // Determine whether the adventure is completed.
   const isCompleted = totalClues > 0 && completedClues >= totalClues;
@@ -456,44 +416,52 @@ function AdventureDetailsPage() {
   };
 
   /**
-   * * Handle the player's answer submission.
-   * * IMPORTANT:
-   * * This function does not unlock clues yet.
-   * * The backend must validate GPS and the answer.
+   * Handle the player's answer submission.
+   * The server checks the GPS position and the answer, and saves the result.
+   * The next location opens only after the server confirms it.
    */
-
   const handleSubmitAnswer = async () => {
     if (!activeClue || !activeLocation) return;
 
     if (!answer.trim()) {
       setValidationMessage("Please enter your answer.");
-
       setValidationType("warning");
-
       return;
     }
 
     if (isValidating) return;
 
     setIsValidating(true);
-
     setValidationMessage("");
-
     setValidationType("");
 
     try {
-      // TODO: Request fresh GPS coordinates.
-      // TODO: Send clue ID, answer and GPS to FastAPI.
-      // TODO: Check the backend validation result.
-      // TODO: Advance only after backend confirmation.
-      setValidationMessage(
-        "GPS and answer verification are not connected yet.",
-      );
+      const position = await getCurrentPosition();
+      const result = await verifyLocationAnswer({
+        locationId: activeLocation.id,
+        answer: answer.trim(),
+        latitude: position.latitude,
+        longitude: position.longitude,
+      });
 
-      setValidationType("warning");
+      setValidationMessage(result.message);
+
+      if (result.missionCompleted) {
+        setCompletedLocations((previous) =>
+          previous.includes(activeLocation.id)
+            ? previous
+            : [...previous, activeLocation.id],
+        );
+        setCurrentLocationIndex(currentLocationIndex + 1);
+        setCurrentClueIndex(0);
+        setAnswer("");
+        setHintVisible(false);
+        setValidationType("success");
+      } else {
+        setValidationType(result.gpsValid ? "warning" : "error");
+      }
     } catch (error) {
       setValidationMessage(error.message || "Unable to verify your answer.");
-
       setValidationType("error");
     } finally {
       setIsValidating(false);

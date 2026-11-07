@@ -1,5 +1,7 @@
 import { useState } from "react";
 import { useNavigate } from "react-router-dom";
+import { useAuth } from "../context/AuthContext.jsx";
+import { updateProfile } from "../services/authService.js";
 import aradQuestLogo from "../../assets/images/backgrounds/aradquest-logo.png";
 import "../styles/AvatarSelectionPage.css";
 
@@ -42,26 +44,22 @@ function AvatarSelectionPage() {
   //Allows navigation between pages
   const navigate = useNavigate();
 
-  const handleFinalize = () => {
+  const { updateUser } = useAuth();
+
+  const handleFinalize = async () => {
     if (!selectedAvatar) {
       alert("Please choose an avatar before continuing!");
       return;
     }
 
-    // Save the selected avatar separately
-    localStorage.setItem("selectedAvatar", selectedAvatar);
-
-    // Get the registered user's information
-    const currentUser = JSON.parse(localStorage.getItem("currentUser") || "{}");
-
-    // Update the user with the selected avatar
-    const updatedUser = {
-      ...currentUser,
-      avatar: selectedAvatar,
-    };
-
-    // Save the updated user
-    localStorage.setItem("currentUser", JSON.stringify(updatedUser));
+    // Save the avatar on the server, then keep the updated user in the app
+    try {
+      const updatedUser = await updateProfile({ avatar: selectedAvatar });
+      updateUser(updatedUser);
+    } catch (error) {
+      alert(error.message || "Unable to save your avatar. Please try again.");
+      return;
+    }
 
     // Continue to HomePage
     navigate("/home");

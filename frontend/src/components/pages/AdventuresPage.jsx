@@ -1,5 +1,7 @@
 import { useState, useEffect } from "react";
 import { useNavigate } from "react-router-dom";
+import { getProgress } from "../services/gameService.js";
+import { ADVENTURE_LOCATIONS } from "../data/adventureLocations.js";
 
 import "../styles/AdventuresPage.css";
 
@@ -9,6 +11,29 @@ import Sidebar from "../layout/Sidebar.jsx";
 // Arad Quest assets
 import natureImage from "../../assets/images/backgrounds/nature-adventure.JPG";
 import historyImage from "../../assets/images/backgrounds/history-adventure.JPG";
+
+// Total clues of an adventure, from its locations.
+function clueCount(adventureId) {
+  return ADVENTURE_LOCATIONS[adventureId].reduce((sum, location) => sum + location.clues, 0);
+}
+
+// Turn the completed location IDs from the server into { adventureId: { completedClues, status } }.
+function progressFromServer(completedLocations) {
+  const result = {};
+
+  for (const [adventureId, locations] of Object.entries(ADVENTURE_LOCATIONS)) {
+    const done = locations.filter((location) => completedLocations.includes(location.id));
+
+    if (done.length === 0) continue;
+
+    result[adventureId] = {
+      completedClues: done.reduce((sum, location) => sum + location.clues, 0),
+      status: done.length === locations.length ? "completed" : "in-progress",
+    };
+  }
+
+  return result;
+}
 
 const adventures = [
   {
@@ -21,7 +46,7 @@ const adventures = [
     icon: "🌿",
     points: 750,
     difficulty: "Medium",
-    clues: 3,
+    clues: clueCount("nature"),
   },
   {
     id: "history",
@@ -33,7 +58,7 @@ const adventures = [
     icon: "🏛️",
     points: 750,
     difficulty: "Medium",
-    clues: 3,
+    clues: clueCount("history"),
   },
 ];
 
@@ -42,18 +67,21 @@ function AdventuresPage() {
   const [progress, setProgress] = useState({});
   const [menuOpen, setMenuOpen] = useState(false);
 
-  // Load adventure progress from localStorage
+  // Load the player's progress from the server.
   useEffect(() => {
-    try {
-      const savedProgress = JSON.parse(
-        localStorage.getItem("adventureProgress") || "{}",
-      );
+    let isCancelled = false;
 
-      setProgress(savedProgress);
-    } catch (error) {
-      console.error("Failed to load adventure progress:", error);
-      setProgress({});
-    }
+    getProgress()
+      .then((data) => {
+        if (!isCancelled) setProgress(progressFromServer(data.completedLocations));
+      })
+      .catch((error) => {
+        if (!isCancelled) console.error("Failed to load adventure progress:", error);
+      });
+
+    return () => {
+      isCancelled = true;
+    };
   }, []);
 
   // Calculate total progress

@@ -1,0 +1,64 @@
+# Runs the whole project. Each service reads its own concept's .env file.
+# docker/.env holds the settings that only Docker needs (host ports, the database URL inside Docker).
+#
+#   docker compose -f docker/docker-compose.yml --env-file docker/.env up -d --build
+#   open http://localhost:8080
+
+name: aradquest
+
+services:
+  db:
+    image: postgis/postgis:17-3.5
+    platform: linux/amd64          # this tag has no arm64 build; Apple Silicon runs it under emulation
+    env_file:
+      - ../database/.env            # POSTGRES_USER, POSTGRES_DB
+      - ../database/secrets.env     # POSTGRES_PASSWORD
+    ports:
+      - "${DB_PORT}:5432"
+    volumes:
+      - pgdata:/var/lib/postgresql/data
+      # Run once, on first start (when the volume is empty). The "20_" and "30_" prefixes make them
+      # run after the image enables PostGIS (10_postgis.sh), which the GEOGRAPHY columns need.
+      - ../database/01_create_tables.sql:/docker-entrypoint-initdb.d/20_create_tables.sql:ro
+      - ../database/02_insert_data.sql:/docker-entrypoint-initdb.d/30_insert_data.sql:ro
+      - ../database/05_user_settings.sql:/docker-entrypoint-initdb.d/40_user_settings.sql:ro
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U \"$$POSTGRES_USER\" -d \"$$POSTGRES_DB\""]
+      interval: 3s
+      retries: 30
+
+  api:
+    build: ../api
+    env_file:
+      - ../api/.env                 # DB_USER, DB_NAME, ALLOWED_ORIGINS, COOKIE_SECURE
+      - ../api/secrets.env          # DB_PASSWORD, SESSION_SECRET
+    environment:
+      # Overrides api/.env: inside Docker the database host is the "db" service, not localhost.
+      DB_HOST: db
+      DB_PORT: "5432"
+    ports:
+      - "${API_PORT}:8000"
+    depends_on:
+      db:
+        condition: service_healthy
+
+  bot:
+    build: ../ai_bot/backend
+    env_file: ../ai_bot/backend/.env   # OPENAI_API_KEY, ALLOWED_ORIGINS
+    ports:
+      - "${BOT_PORT}:8000"
+
+  web:
+    build:
+      context: ../frontend
+      args:
+        VITE_CHATBOT_API_URL: ${VITE_CHATBOT_API_URL}
+    environment:
+      API_UPSTREAM: http://api:8000   # nginx forwards /api/ to the api service
+    ports:
+      - "${WEB_PORT}:8080"
+    depends_on:
+      - api
+
+volumes:
+  pgdata:

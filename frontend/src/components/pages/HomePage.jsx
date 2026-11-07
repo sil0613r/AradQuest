@@ -2,6 +2,7 @@ import { useState } from "react";
 import { Link, useNavigate } from "react-router-dom";
 import "../styles/HomePage.css";
 import Sidebar from "../layout/Sidebar.jsx";
+import { useAuth } from "../context/AuthContext.jsx";
 import explorerAvatar from "../../assets/images/avatars/explorer.png";
 import adventurerAvatar from "../../assets/images/avatars/adventurer.png";
 import championAvatar from "../../assets/images/avatars/champion.png";
@@ -65,17 +66,11 @@ function HomePage() {
 
   const [menuOpen, setMenuOpen] = useState(false);
 
-  // Retrieve user information from localStorage.
-  // These values will later come from the backend.
-  const storedUser = JSON.parse(localStorage.getItem("currentUser") || "{}");
+  // The name and avatar come from the logged-in account.
+  const { user } = useAuth();
 
-  const username =
-    storedUser.username ||
-    localStorage.getItem("username") ||
-    localStorage.getItem("userName") ||
-    "Explorer";
-  const selectedAvatar =
-    storedUser.avatar || localStorage.getItem("selectedAvatar") || "explorer";
+  const username = user?.username || "Explorer";
+  const selectedAvatar = user?.avatar || "explorer";
 
   const avatar = avatarOptions[selectedAvatar] || avatarOptions.explorer;
 
