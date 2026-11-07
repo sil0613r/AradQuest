@@ -1,4 +1,4 @@
-@import url("https://fonts.googleapis.com/css2?family=Nunito:wght@400;500;600;700;800&family=Playfair+Display:wght@600;700&display=swap");
+@import url("https://fonts.googleapis.com/css2?family=Nunito:wght@400;500;600;700;800&family=Playfair+Display:wght@600;700&family=Poppins:wght@400;500;600;700&display=swap");
 
 :root {
   --rewards-cream: #f1e2c9;
@@ -402,9 +402,10 @@
 
 .rewards-card h3 {
   margin: 14px 0 6px;
-  font-family: "Playfair Display", serif;
+  font-family: "Poppins", sans-serif;
   font-size: 19px;
-  font-style: italic;
+  font-weight: 600;
+  font-style: normal;
 }
 
 .rewards-card-description {
@@ -509,8 +510,9 @@
 
 .rewards-claimed-info h3 {
   margin: 0;
-  font-family: "Playfair Display", serif;
+  font-family: "Poppins", sans-serif;
   font-size: 17px;
+  font-weight: 600;
 }
 
 .rewards-claimed-info p {

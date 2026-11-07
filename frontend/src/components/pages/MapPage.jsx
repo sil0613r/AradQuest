@@ -73,7 +73,7 @@ function MapPage() {
   const [userPosition, setUserPosition] = useState(null);
 
   // Load the saved progress once, when the page opens.
-  const [discoveryProgress, setDiscoveryProgress] = useState(() =>
+  const [discoveryProgress] = useState(() =>
     JSON.parse(localStorage.getItem("adventureProgress") || "{}"),
   );
   const [showFinalDiscovery, setShowFinalDiscovery] = useState(false);
@@ -111,23 +111,6 @@ function MapPage() {
   ).length;
 
   const isAdventureCompleted = completedClues >= totalClues;
-
-  //This temporary function is used to simulate the completion of a clue. In a real application, this would be triggered by the user solving a clue or completing an objective.
-
-  const handleCompleteClue = () => {
-    if (completedClues >= totalClues) return;
-
-    const updatedProgress = {
-      ...discoveryProgress,
-      [activeAdventure]: {
-        completedClues: completedClues + 1,
-      },
-    };
-
-    setDiscoveryProgress(updatedProgress);
-
-    localStorage.setItem("adventureProgress", JSON.stringify(updatedProgress));
-  };
 
   // --------------------------------------------------
   // GPS TRACKING
@@ -434,19 +417,6 @@ function MapPage() {
               })}
             </div>
 
-            {/* TEMPORARY TEST BUTTON */}
-            <button
-              className="map-complete-clue-button"
-              onClick={handleCompleteClue}
-              disabled={isAdventureCompleted}
-            >
-              {isAdventureCompleted
-                ? "🏆 Adventure Completed"
-                : "🔓 Complete Clue"}
-            </button>
-
-            {/* GPS DISTANCE */}
-
             {/* AR EXPERIENCE */}
 
             <button
@@ -489,7 +459,7 @@ function MapPage() {
 
               <div className="map-final-reward">
                 <span>⭐</span>
-                <strong>750 points earned</strong>
+                <strong>200 points earned</strong>
               </div>
 
               <button onClick={() => setShowFinalDiscovery(false)}>

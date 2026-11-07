@@ -40,6 +40,8 @@ psql "$DATABASE_PUBLIC_URL" -v ON_ERROR_STOP=1 -f database/05_user_settings.sql
 
 3. Turn the TCP proxy off again once the scripts have run. The API reaches the database over the private network, so it does not need the proxy.
 
+To run the same scripts from the repo with `scripts/local.sh`, put the public URL in `api/secrets.env` as `DATABASE_URL` (see section 7).
+
 All three scripts can be run again on a database that already has the data:
 
 - `01` creates the PostGIS extension and each table only if it is missing.
@@ -142,6 +144,16 @@ Then open the site, register an account, pick an avatar, and submit one answer. 
 - `api/backend_main.py`: the teammate's standalone server, excluded from the API image.
 - `database/.env.remote`: old values, not used by Railway.
 
+## 7. Run the app on your computer with the Railway database
+
+The local app uses the same Railway database, so no PostgreSQL container runs on your computer.
+
+1. On the `PostGIS` service, add the TCP proxy (step 2.1) and copy `DATABASE_PUBLIC_URL` from the **Variables** tab.
+2. Put it in `api/secrets.env`: `DATABASE_URL=postgresql://...` (the file is not committed).
+3. From the repo root: `scripts/local.sh up`. It applies the three SQL scripts to that database (safe to repeat), starts `api`, `bot` and `web`, and prints the addresses. `scripts/local.sh test` runs the full checks against the same database, so test accounts are created there.
+
+The local database container is still in `docker/docker-compose.yml` under the profile `local-db`, for an offline setup. `scripts/local.sh` does not use it.
+
 ## Local run (for comparison)
 
-From the repo root: `docker compose -f docker/docker-compose.yml --env-file docker/.env up -d --build`, then open `http://localhost:8080`. The settings are in `docker/.env` and the `.env` and `secrets.env` files next to each service.
+`scripts/local.sh up` is the usual way. Without the script: `docker compose -f docker/docker-compose.yml --env-file docker/.env up -d --build`, then open `http://localhost:8080`. The settings are in `docker/.env` and the `.env` and `secrets.env` files next to each service.

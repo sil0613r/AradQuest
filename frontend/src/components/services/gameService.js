@@ -3,6 +3,12 @@ import { apiRequest } from "./apiClient.js";
 
 // Ask the browser for the player's current position. Rejects if location is unavailable or denied.
 export function getCurrentPosition() {
+  // Test mode (VITE_NO_GPS=true, set by scripts/local.sh --no-gps): no browser prompt.
+  // The server does not check the distance in that mode, so any position works.
+  if (import.meta.env.VITE_NO_GPS === "true") {
+    return Promise.resolve({ latitude: 0, longitude: 0 });
+  }
+
   return new Promise((resolve, reject) => {
     if (!navigator.geolocation) {
       reject(new Error("This browser cannot read your location."));

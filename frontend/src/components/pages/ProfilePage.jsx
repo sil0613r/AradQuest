@@ -1,8 +1,9 @@
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import { useNavigate } from "react-router-dom";
 import "../styles/ProfilePage.css";
 import Sidebar from "../layout/Sidebar.jsx";
 import { useAuth } from "../context/useAuth.js";
+import { getProfile } from "../services/authService.js";
 
 // Arad Quest assets
 import explorerAvatar from "../../assets/images/avatars/explorer.png";
@@ -17,61 +18,68 @@ const avatarImages = {
   pathfinder: pathfinderAvatar,
 };
 
+const ADVENTURE_ICONS = { nature: "🌿", history: "🏛️" };
+const ADVENTURE_CATEGORIES = { nature: "Nature", history: "History" };
+
+// Shown as empty fields until the database has a value for them.
+const EMPTY_STATS = { totalPoints: 0, adventuresStarted: 0, placesDiscovered: 0, badgesEarned: 0 };
+
+function formatDate(value) {
+  if (!value) return "";
+  return new Date(value).toLocaleDateString("en-GB", {
+    day: "numeric",
+    month: "long",
+    year: "numeric",
+  });
+}
+
+function formatMonthYear(value) {
+  if (!value) return "";
+  return new Date(value).toLocaleDateString("en-GB", {
+    month: "long",
+    year: "numeric",
+  });
+}
+
 function ProfilePage() {
   const navigate = useNavigate();
   const [menuOpen, setMenuOpen] = useState(false);
 
-  // The name and email come from the logged-in account.
+  // The name, email and avatar come from the logged-in account.
   const { user } = useAuth();
-  const username = user?.username || "Explorer";
+  const username = user?.username || "";
   const email = user?.email || "";
   const avatarImage = avatarImages[user?.avatar] || explorerAvatar;
 
+  // Everything else comes from the database (GET /users/me). Null until it has loaded.
+  const [profile, setProfile] = useState(null);
+  const [loadError, setLoadError] = useState("");
+
+  useEffect(() => {
+    let cancelled = false;
+    getProfile()
+      .then((data) => {
+        if (!cancelled) setProfile(data);
+      })
+      .catch(() => {
+        if (!cancelled) setLoadError("Your profile could not be loaded. Please refresh the page.");
+      });
+    return () => {
+      cancelled = true;
+    };
+  }, []);
+
+  const stats = profile?.profile?.stats ?? EMPTY_STATS;
+  const badges = profile?.profile?.badges ?? [];
+  const adventureHistory = profile?.profile?.adventureHistory ?? [];
+  const joinedAt = formatMonthYear(profile?.joinedAt);
+  const completedAdventures = adventureHistory.filter((a) => a.status === "completed").length;
+
   const profileStats = [
-    { icon: "⭐", value: "250", label: "Total Points" },
-    { icon: "🗺️", value: "4", label: "Adventures Started" },
-    { icon: "📍", value: "12", label: "Places Discovered" },
-    { icon: "🏆", value: "3", label: "Badges Earned" },
-  ];
-
-  const badges = [
-    {
-      icon: "🌿",
-      title: "Nature Explorer",
-      description: "Discover natural wonders",
-      color: "green",
-    },
-    {
-      icon: "🏛️",
-      title: "History Lover",
-      description: "Explore Arad's history",
-      color: "gold",
-    },
-    {
-      icon: "🧭",
-      title: "Brave Explorer",
-      description: "Complete your first quest",
-      color: "blue",
-    },
-  ];
-
-  const adventureHistory = [
-    {
-      icon: "🌿",
-      title: "Ceala Forest Adventure",
-      category: "Nature",
-      date: "October 24, 2026",
-      progress: 100,
-      status: "Completed",
-    },
-    {
-      icon: "🏛️",
-      title: "Mysteries of Arad Center",
-      category: "History",
-      date: "October 20, 2026",
-      progress: 60,
-      status: "In Progress",
-    },
+    { icon: "⭐", value: stats.totalPoints, label: "Total Points" },
+    { icon: "🗺️", value: stats.adventuresStarted, label: "Adventures Started" },
+    { icon: "📍", value: stats.placesDiscovered, label: "Places Discovered" },
+    { icon: "🏆", value: stats.badgesEarned, label: "Badges Earned" },
   ];
 
   return (
@@ -93,6 +101,7 @@ function ProfilePage() {
             <p>Every explorer has a story. This is yours.</p>
           </div>
 
+          {/* Update: name, email and avatar are changed on the Settings page */}
           <button
             className="profile-edit-button"
             onClick={() => navigate("/settings")}
@@ -100,6 +109,8 @@ function ProfilePage() {
             ✎ Edit Profile
           </button>
         </header>
+
+        {loadError && <p className="profile-empty">{loadError}</p>}
 
         {/* PROFILE HERO */}
         <section className="profile-hero-card">
@@ -119,19 +130,15 @@ function ProfilePage() {
               <p>{email}</p>
 
               <div className="profile-hero-meta">
-                <span>📍 Arad, Romania</span>
-                <span>🗓️ Member since October 2026</span>
+                {joinedAt && <span>🗓️ Member since {joinedAt}</span>}
               </div>
             </div>
 
             <div className="profile-level-card">
               <span className="profile-level-icon">🧭</span>
-              <span className="profile-level-label">EXPLORER LEVEL</span>
-              <strong>Level 3</strong>
-              <div className="profile-level-progress">
-                <div className="profile-level-progress-fill"></div>
-              </div>
-              <small>250 / 400 XP</small>
+              <span className="profile-level-label">ADVENTURES</span>
+              <strong>{stats.adventuresStarted}</strong>
+              <small>{completedAdventures} completed</small>
             </div>
           </div>
         </section>
@@ -163,22 +170,24 @@ function ProfilePage() {
               <h2>My Badges</h2>
               <p>Special rewards for your discoveries.</p>
             </div>
-            <button className="profile-view-all-button">View all →</button>
           </div>
 
-          <div className="profile-badges-grid">
-            {badges.map((badge) => (
-              <article
-                className={`profile-badge-card badge-${badge.color}`}
-                key={badge.title}
-              >
-                <div className="profile-badge-icon">{badge.icon}</div>
-                <h3>{badge.title}</h3>
-                <p>{badge.description}</p>
-                <span className="profile-badge-earned">✓ Earned</span>
-              </article>
-            ))}
-          </div>
+          {badges.length === 0 ? (
+            <p className="profile-empty">No badges yet. Complete locations to earn them.</p>
+          ) : (
+            <div className="profile-badges-grid">
+              {badges.map((badge) => (
+                <article className="profile-badge-card badge-blue" key={badge.name}>
+                  <div className="profile-badge-icon">🏅</div>
+                  <h3>{badge.name}</h3>
+                  <p>{badge.description}</p>
+                  <span className="profile-badge-earned">
+                    ✓ Earned {formatDate(badge.earnedAt)}
+                  </span>
+                </article>
+              ))}
+            </div>
+          )}
         </section>
 
         {/* ADVENTURE HISTORY */}
@@ -197,44 +206,51 @@ function ProfilePage() {
             </button>
           </div>
 
-          <div className="profile-history-list">
-            {adventureHistory.map((adventure) => (
-              <article className="profile-history-card" key={adventure.title}>
-                <div className="profile-history-icon">{adventure.icon}</div>
-
-                <div className="profile-history-info">
-                  <div className="profile-history-title-row">
-                    <h3>{adventure.title}</h3>
-                    <span
-                      className={`profile-history-status ${
-                        adventure.status === "Completed"
-                          ? "completed"
-                          : "in-progress"
-                      }`}
-                    >
-                      {adventure.status}
-                    </span>
-                  </div>
-
-                  <div className="profile-history-meta">
-                    <span>{adventure.category}</span>
-                    <span>•</span>
-                    <span>{adventure.date}</span>
-                  </div>
-
-                  <div className="profile-history-progress">
-                    <div className="profile-history-progress-track">
-                      <div
-                        className="profile-history-progress-fill"
-                        style={{ width: `${adventure.progress}%` }}
-                      ></div>
+          {adventureHistory.length === 0 ? (
+            <p className="profile-empty">No adventures started yet.</p>
+          ) : (
+            <div className="profile-history-list">
+              {adventureHistory.map((adventure) => {
+                const completed = adventure.status === "completed";
+                return (
+                  <article className="profile-history-card" key={adventure.routeId}>
+                    <div className="profile-history-icon">
+                      {ADVENTURE_ICONS[adventure.adventure] ?? "🧭"}
                     </div>
-                    <span>{adventure.progress}%</span>
-                  </div>
-                </div>
-              </article>
-            ))}
-          </div>
+
+                    <div className="profile-history-info">
+                      <div className="profile-history-title-row">
+                        <h3>{adventure.title}</h3>
+                        <span
+                          className={`profile-history-status ${
+                            completed ? "completed" : "in-progress"
+                          }`}
+                        >
+                          {completed ? "Completed" : "In Progress"}
+                        </span>
+                      </div>
+
+                      <div className="profile-history-meta">
+                        <span>{ADVENTURE_CATEGORIES[adventure.adventure] ?? ""}</span>
+                        <span>•</span>
+                        <span>{formatDate(adventure.startedAt)}</span>
+                      </div>
+
+                      <div className="profile-history-progress">
+                        <div className="profile-history-progress-track">
+                          <div
+                            className="profile-history-progress-fill"
+                            style={{ width: `${adventure.progressPercentage}%` }}
+                          ></div>
+                        </div>
+                        <span>{adventure.progressPercentage}%</span>
+                      </div>
+                    </div>
+                  </article>
+                );
+              })}
+            </div>
+          )}
         </section>
 
         {/* FOOTER */}

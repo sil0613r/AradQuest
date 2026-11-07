@@ -120,7 +120,7 @@ Missions live in `backend/missions.json`. It contains the answers, so keep it on
     "route": "cultural",
     "title": "Primăria",
     "description": "The text the player sees: location text and the question.",
-    "answer": "Ioan",
+    "answer": "4",
     "also_block": ["John"],
     "clues": ["hardest hint", "middle hint", "easier hint", "easiest hint"]
   }

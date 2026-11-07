@@ -19,14 +19,16 @@ const note = (text) => {
 // History locations in play order, with the real coordinates and the accepted answer for each.
 // The answers come from the database; the frontend never sees them.
 const HISTORY = [
-  { id: "primaria-arad", name: "Primaria Arad", lat: 46.1751, lng: 21.3172, answer: "Ioan", points: 20 },
+  { id: "primaria-arad", name: "Primaria Arad", lat: 46.1751, lng: 21.3172, answer: "4", points: 20 },
   { id: "teatrul-ioan-slavici", name: "Teatrul Clasic Ioan Slavici", lat: 46.1708, lng: 21.3156, answer: "2", points: 30 },
   { id: "biserica-rosie", name: "Biserica Rosie", lat: 46.1775, lng: 21.32, answer: "5", points: 20 },
   { id: "moise-nicoara", name: "Colegiul National Moise Nicoara", lat: 46.1711, lng: 21.3192, answer: "77", points: 20 },
-  { id: "palatul-cultural", name: "Filarmonica", lat: 46.1738, lng: 21.3168, answer: "cheia sol", points: 20 },
+  { id: "palatul-cultural", name: "Filarmonica", lat: 46.1738, lng: 21.3168, answer: "3", points: 20 },
   { id: "vechiul-cazino", name: "Vechiul Cazinou", lat: 46.1705, lng: 21.3218, answer: "3", points: 20 },
 ];
 const FAR = { latitude: 44.4268, longitude: 26.1025 };
+// Set by scripts/local.sh --no-gps: the server accepts answers from any place, so "far away" is not tested.
+const NO_GPS = process.env.NO_GPS === "1";
 
 (async () => {
   const browser = await chromium.launch({
@@ -127,7 +129,7 @@ const FAR = { latitude: 44.4268, longitude: 26.1025 };
         ]);
         await page.waitForTimeout(2500);
         const replyText = (await bodyText()).toLowerCase();
-        check("chatbot: asked for the answer, reply does not leak it", resp.status() === 200 && !replyText.includes("cheia sol"), `status ${resp.status()}`);
+        check("chatbot: asked for the answer, reply does not leak it", resp.status() === 200 && !replyText.includes("cheia sol") && !/\btrei\b/.test(replyText), `status ${resp.status()}`);
         await page.click(".ai-chat-floating-button");
       }
 
@@ -140,13 +142,15 @@ const FAR = { latitude: 44.4268, longitude: 26.1025 };
         check("verify button disabled with an empty answer", await verifyBtn.isDisabled());
       }
 
-      // Wrong place first: refused with the distance
-      await context.setGeolocation(FAR);
-      await page.fill(".clue-answer-input", loc.answer);
-      await page.click("button:has-text('Verify GPS & Answer')");
-      await page.waitForTimeout(2200);
-      const farMsg = await page.locator(".clue-validation-message").innerText().catch(() => "");
-      check(`location ${i + 1}: far away is refused`, /away/i.test(farMsg), farMsg);
+      // Wrong place first: refused with the distance (skipped in --no-gps mode)
+      if (!NO_GPS) {
+        await context.setGeolocation(FAR);
+        await page.fill(".clue-answer-input", loc.answer);
+        await page.click("button:has-text('Verify GPS & Answer')");
+        await page.waitForTimeout(2200);
+        const farMsg = await page.locator(".clue-validation-message").innerText().catch(() => "");
+        check(`location ${i + 1}: far away is refused`, /away/i.test(farMsg), farMsg);
+      }
 
       // Right place, right answer
       await context.setGeolocation({ latitude: loc.lat, longitude: loc.lng });

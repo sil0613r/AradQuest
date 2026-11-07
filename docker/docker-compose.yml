@@ -7,7 +7,10 @@
 name: aradquest
 
 services:
+  # Local database, only when asked for: docker compose --profile local-db ... up -d db
+  # The game does not use it by default. The API reads DATABASE_URL (Railway) from api/secrets.env.
   db:
+    profiles: ["local-db"]
     image: postgis/postgis:17-3.5
     platform: linux/amd64          # this tag has no arm64 build; Apple Silicon runs it under emulation
     env_file:
@@ -30,19 +33,15 @@ services:
   api:
     build: ../api
     env_file:
-      - ../api/.env                 # DB_USER, DB_NAME, ALLOWED_ORIGINS, COOKIE_SECURE
-      - ../api/secrets.env          # DB_PASSWORD, SESSION_SECRET
+      - ../api/.env                 # ALLOWED_ORIGINS, COOKIE_SECURE
+      - ../api/secrets.env          # DATABASE_URL (Railway), SESSION_SECRET
     environment:
-      # Overrides api/.env: inside Docker the database host is the "db" service, not localhost.
-      DB_HOST: db
-      DB_PORT: "5432"
+      # false only in test mode (scripts/local.sh up --no-gps). Default: the distance is checked.
+      GPS_CHECK_ENABLED: ${GPS_CHECK_ENABLED:-true}
       # The chatbot service holds the hint texts. Its token is in api/secrets.env (BOT_INTERNAL_TOKEN).
       BOT_INTERNAL_URL: http://bot:8000
     ports:
       - "${API_PORT}:8000"
-    depends_on:
-      db:
-        condition: service_healthy
 
   bot:
     build: ../ai_bot/backend
@@ -55,6 +54,7 @@ services:
       context: ../frontend
       args:
         VITE_CHATBOT_API_URL: ${VITE_CHATBOT_API_URL}
+        VITE_NO_GPS: ${VITE_NO_GPS:-false}
     environment:
       API_UPSTREAM: http://api:8000   # nginx forwards /api/ to the api service
     ports:

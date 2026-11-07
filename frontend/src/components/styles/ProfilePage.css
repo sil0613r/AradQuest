@@ -659,3 +659,13 @@
     font-size: 14px;
   }
 }
+
+/* Empty states: a new player has no badges or adventures yet */
+.profile-empty {
+  margin: 8px 0 0;
+  padding: 18px 20px;
+  border-radius: 14px;
+  background: rgba(255, 255, 255, 0.6);
+  color: #6b5a45;
+  font-size: 15px;
+}

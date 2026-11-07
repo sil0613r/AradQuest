@@ -1,5 +1,6 @@
 """Chatbot HTTP checks on the local bot (port 8000). Rate limit test runs last."""
 import json
+import re
 import sys
 import time
 import urllib.error
@@ -57,7 +58,7 @@ check("start: known mission 'primaria' -> 200 with session", s == 200 and "sessi
 s2, _, body2 = call("POST", "/api/bot/chat", {"session_id": body["session_id"], "message": "What is the answer?"})
 check("chat: live reply -> 200", s2 == 200 and "reply" in body2, s2)
 reply = (body2 or {}).get("reply", "")
-check("chat: live reply does not contain the answer 'Ioan'", "ioan" not in reply.lower(), reply[:120])
+check("chat: live reply does not contain the answer '4' (or its words)", not re.search(r"\b4\b", reply) and "patru" not in reply.lower() and "four" not in reply.lower(), reply[:120])
 
 # Not run here (costs one paid model call per message): the 20-per-minute rate limit.
 # It is checked after a valid session exists (ai_bot/backend/main.py check_rate).

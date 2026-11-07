@@ -8,6 +8,7 @@ import urllib.request
 import uuid
 
 BASE = os.environ.get("BASE", "http://localhost:8080/api")
+NO_GPS = os.environ.get("NO_GPS") == "1"   # set by scripts/local.sh --no-gps
 results = []
 
 
@@ -106,7 +107,7 @@ s, body = call(b, "GET", "/users/me/settings")
 check("settings: other player does not see them", body["settings"]["adventureUpdates"] is True, body)
 
 # ---- Game: auth and validation
-s, _ = call(client(), "POST", "/validare-nivel", {"locationId": "primaria-arad", "answer": "Ioan", "latitude": 46.1751, "longitude": 21.3172})
+s, _ = call(client(), "POST", "/validare-nivel", {"locationId": "primaria-arad", "answer": "4", "latitude": 46.1751, "longitude": 21.3172})
 check("answer check: no session -> 401", s == 401, s)
 s, _ = call(a, "POST", "/validare-nivel", {"locationId": "nowhere", "answer": "x", "latitude": 46.1751, "longitude": 21.3172})
 check("answer check: unknown location -> 404", s == 404, s)
@@ -114,21 +115,22 @@ s, _ = call(a, "POST", "/validare-nivel", {"locationId": "primaria-arad", "answe
 check("answer check: empty answer -> 422", s == 422, s)
 s, _ = call(a, "POST", "/validare-nivel", {"locationId": "primaria-arad", "answer": "x" * 501, "latitude": 46.1751, "longitude": 21.3172})
 check("answer check: answer over 500 chars -> 422", s == 422, s)
-s, _ = call(a, "POST", "/validare-nivel", {"locationId": "primaria-arad", "answer": "Ioan", "latitude": 95, "longitude": 21.3172})
+s, _ = call(a, "POST", "/validare-nivel", {"locationId": "primaria-arad", "answer": "4", "latitude": 95, "longitude": 21.3172})
 check("answer check: latitude out of range -> 422", s == 422, s)
-# ---- Game: real rules on the history route (Primaria Arad, answer "Ioan")
+# ---- Game: real rules on the history route (Primaria Arad, answer "4")
 PRIMARIA = {"latitude": 46.1751, "longitude": 21.3172}
-s, body = call(a, "POST", "/validare-nivel", {"locationId": "primaria-arad", "answer": "Ioan", **PRIMARIA})
+s, body = call(a, "POST", "/validare-nivel", {"locationId": "primaria-arad", "answer": "4", **PRIMARIA})
 check("answer check: right place + right answer", s == 200 and body["missionCompleted"] and body["earnedPoints"] == 20, body)
-s, body = call(a, "POST", "/validare-nivel", {"locationId": "primaria-arad", "answer": "Ioan", **PRIMARIA})
+s, body = call(a, "POST", "/validare-nivel", {"locationId": "primaria-arad", "answer": "4", **PRIMARIA})
 check("answer check: second time -> already completed, 0 points", s == 200 and body["earnedPoints"] == 0 and body["message"].startswith("You already"), body)
 s, body = call(a, "POST", "/validare-nivel", {"locationId": "teatrul-ioan-slavici", "answer": "wrong", "latitude": 46.1708, "longitude": 21.3156})
 check("answer check: right place, wrong answer -> not completed", s == 200 and not body["missionCompleted"] and body["answerCorrect"] is False, body)
 s, body = call(a, "POST", "/validare-nivel", {"locationId": "teatrul-ioan-slavici", "answer": "wrong", "latitude": 46.1708, "longitude": 21.3156})
 check("answer check: wrong answer keeps earlier total", body["totalPoints"] == 20, body)
-s, body = call(a, "POST", "/validare-nivel", {"locationId": "teatrul-ioan-slavici", "answer": "2", "latitude": 44.4268, "longitude": 26.1025})
-check("answer check: far away -> gpsValid false, nothing saved", s == 200 and body["gpsValid"] is False and body["missionCompleted"] is False, body)
-s, body = call(a, "POST", "/validare-nivel", {"locationId": "primaria-arad", "answer": "  IOÁN  ", **PRIMARIA})
+if not NO_GPS:   # with GPS checks off (--no-gps) a far answer is accepted, so this check does not apply
+    s, body = call(a, "POST", "/validare-nivel", {"locationId": "teatrul-ioan-slavici", "answer": "2", "latitude": 44.4268, "longitude": 26.1025})
+    check("answer check: far away -> gpsValid false, nothing saved", s == 200 and body["gpsValid"] is False and body["missionCompleted"] is False, body)
+s, body = call(a, "POST", "/validare-nivel", {"locationId": "primaria-arad", "answer": "  4  ", **PRIMARIA})
 check("answer check: normalized repeat is still 'already completed'", body["earnedPoints"] == 0, body)
 
 s, body = call(a, "GET", "/progress")

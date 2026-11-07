@@ -13,10 +13,14 @@ from psycopg.types.json import Jsonb
 from pydantic import BaseModel, EmailStr, Field, field_validator
 from starlette.middleware.sessions import SessionMiddleware
 
+import ai_chat
+import adventures
 import game
+import rewards
 import settings
 from db import pool
-from deps import require_user_id
+from deps import iso_utc, require_user_id
+from user_profile import profile_summary
 from security import MAX_PASSWORD_BYTES, hash_password, verify_password
 
 DEFAULT_AVATAR_ID = 1   # jucatori.avatar_id must be 1-4; 1 = Explorer. Players choose later.
@@ -176,13 +180,45 @@ def me(request: Request):
 
     with pool.connection() as conn:
         row = conn.execute(
-            f"SELECT {USER_COLUMNS} FROM jucatori WHERE player_id = %s", (user_id,)
+            f"SELECT {USER_COLUMNS}, created_at FROM jucatori WHERE player_id = %s", (user_id,)
         ).fetchone()
+        if row is None:   # account was deleted while the cookie was still valid
+            request.session.clear()
+            raise HTTPException(401, "Not logged in")
+        counts = conn.execute(
+            "SELECT COUNT(*) FILTER (WHERE status = 'completed') AS completed, "
+            "COUNT(*) FILTER (WHERE status = 'in_progress') AS active "
+            "FROM progres_jucatori_trasee WHERE player_id = %s",
+            (user_id,),
+        ).fetchone()
+        profile = profile_summary(conn, user_id, row["total_points"])
 
+    return {
+        "user": public_user(row),
+        "completedAdventures": counts["completed"],
+        "activeAdventures": counts["active"],
+        "joinedAt": iso_utc(row["created_at"]),   # from the database: the time the account was created
+        "profile": profile,                        # stats, adventure history and badges, for the profile page
+    }
+
+
+class AvatarRequest(BaseModel):
+    # API contract, endpoint 5: an integer from 1 to 4.
+    avatarId: int = Field(ge=1, le=4)
+
+
+@app.patch("/users/me/avatar")
+def update_avatar(body: AvatarRequest, request: Request):
+    user_id = require_user_id(request)
+    with pool.connection() as conn:
+        row = conn.execute(
+            "UPDATE jucatori SET avatar_id = %s WHERE player_id = %s RETURNING player_id",
+            (body.avatarId, user_id),
+        ).fetchone()
     if row is None:   # account was deleted while the cookie was still valid
         request.session.clear()
         raise HTTPException(401, "Not logged in")
-    return {"user": public_user(row)}
+    return {"success": True, "avatarId": body.avatarId}
 
 
 @app.post("/auth/logout")
@@ -252,5 +288,8 @@ def put_settings(body: UserSettings, request: Request):
     return {"settings": body}
 
 
-# Answer checks and progress (api/game.py). Paths have no /api prefix: nginx adds it in Docker.
-app.include_router(game.router)
+# Routes for the API contract and the React app. Paths have no /api prefix: nginx adds it in Docker.
+app.include_router(game.router)        # answer checks, hints, progress (React app)
+app.include_router(adventures.router)  # /adventures, start, progress, current clue, map
+app.include_router(rewards.router)     # /rewards
+app.include_router(ai_chat.router)     # /ai/chat

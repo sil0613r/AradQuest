@@ -7,15 +7,12 @@ from dotenv import load_dotenv
 from fastapi import FastAPI, Response, Request
 from pydantic import BaseModel
 
-load_dotenv(Path(__file__).parent / "secrets.env")   # BACKEND_DB_PASSWORD
+load_dotenv(Path(__file__).parent / "secrets.env")   # DATABASE_URL
 
 
 DB_CONFIG = {
-    "dbname": "arad_quest",
-    "user": "lorena_backend",
-    "password": os.getenv("BACKEND_DB_PASSWORD", ""),   # set in api/secrets.env, never in this file
-    "host": "100.75.27.52",
-    "port": "5432",
+    # The Railway database. The URL (with its password) is set in api/secrets.env, never in this file.
+    "dsn": os.getenv("DATABASE_URL", ""),
 }
 
 app = FastAPI()
@@ -227,15 +224,24 @@ def get_user_profile(request: Request):
         if not user:
             return {"error": {"code": "NOT_FOUND", "message": "Utilizatorul nu a fost gasit in baza de date."}}
 
+        # Adventure counts come from progres_jucatori_trasee, not from fixed numbers.
+        cursor.execute(
+            "SELECT COUNT(*) FILTER (WHERE status = 'completed'), "
+            "COUNT(*) FILTER (WHERE status = 'in_progress') "
+            "FROM progres_jucatori_trasee WHERE player_id = %s;",
+            (player_id,),
+        )
+        completed_adventures, active_adventures = cursor.fetchone()
+
         return {
             "id": user[0],
             "username": user[1],
             "email": user[2],
             "avatarId": user[3] if user[3] else 1,
             "totalPoints": user[4] if user[4] else 0,
-            "completedAdventures": 0,
-            "activeAdventures": 0,
-            "joinedAt": user[5].isoformat() + "Z" if user[5] else "2026-11-06T18:00:00Z"
+            "completedAdventures": completed_adventures,
+            "activeAdventures": active_adventures,
+            "joinedAt": user[5].isoformat() + "Z" if user[5] else None   # the database value, never a fixed date
         }
 
     except Exception as e:

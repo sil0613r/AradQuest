@@ -75,8 +75,8 @@ check("mission: hint cost is 10", m["hintCost"] == 10, m["hintCost"])
 s, body = call(a, "POST", "/hints/next", {"locationId": "biserica-rosie"})
 check("hint: refused with 0 points (409)", s == 409 and "points" in body["detail"], f"{s} {body}")
 
-# Earn 20 points by solving Primaria (answer Ioan, correct place)
-s, body = call(a, "POST", "/validare-nivel", {"locationId": "primaria-arad", "answer": "Ioan", "latitude": 46.1751, "longitude": 21.3172})
+# Earn 20 points by solving Primaria (answer 4, correct place)
+s, body = call(a, "POST", "/validare-nivel", {"locationId": "primaria-arad", "answer": "4", "latitude": 46.1751, "longitude": 21.3172})
 check("setup: solved primaria, 20 points", body["totalPoints"] == 20, body.get("totalPoints"))
 
 # Open two hints in list order, 10 points each

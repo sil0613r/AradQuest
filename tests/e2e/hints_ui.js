@@ -12,7 +12,7 @@ const check = (name, ok, detail = "") => {
 };
 const note = (text) => console.log(`INFO  ${text}`);
 
-// Primaria Arad is the first history location. Its answer is "Ioan" and it gives 20 points.
+// Primaria Arad is the first history location. Its answer is "4" and it gives 20 points.
 const AT_PRIMARIA = { latitude: 46.1751, longitude: 21.3172 };
 const TEATRUL = "teatrul-ioan-slavici";
 
@@ -51,7 +51,7 @@ const TEATRUL = "teatrul-ioan-slavici";
 
     // 2. Earn 20 points by answering Primaria Arad through the API
     const earned = await context.request.post(`${SITE}/api/validare-nivel`, {
-      data: { locationId: "primaria-arad", answer: "Ioan", ...AT_PRIMARIA },
+      data: { locationId: "primaria-arad", answer: "4", ...AT_PRIMARIA },
     });
     check("primaria answered (20 points)", earned.status() === 200 && (await points()) === 20, `status ${earned.status()}`);
 

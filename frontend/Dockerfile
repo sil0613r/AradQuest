@@ -13,6 +13,9 @@ COPY . .
 ARG VITE_CHATBOT_API_URL
 ENV VITE_CHATBOT_API_URL=$VITE_CHATBOT_API_URL \
     VITE_API_URL=/api
+# "true" only in test mode (scripts/local.sh up --no-gps): the browser does not ask for the location.
+ARG VITE_NO_GPS=false
+ENV VITE_NO_GPS=$VITE_NO_GPS
 
 RUN npm run build
 

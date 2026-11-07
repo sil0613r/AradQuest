@@ -5,7 +5,8 @@
 -- PostgreSQL + PostGIS
 --
 -- Safe to run more than once: each row is inserted only if it is not already there
--- (ON CONFLICT or WHERE NOT EXISTS). Rows you added or changed yourself are left alone.
+-- (ON CONFLICT or WHERE NOT EXISTS). The questions of the missions and the accepted answers
+-- come from traseu_historic.txt and traseu_natural.txt: section 5a and section 6 set them again on every run.
 -- Run 01_create_tables.sql first.
 -- ==========================================
 
@@ -207,6 +208,32 @@ JOIN obiective_turistice o
 ON CONFLICT (route_id, objective_id) DO NOTHING;
 
 -- ==========================================
+-- 5a. INTREBARILE SCHIMBATE (din fisierele traseelor)
+-- ==========================================
+
+-- Updated by objective, before the insert below: a database that already has the old missions
+-- gets the new question in place, instead of a second mission for the same location.
+UPDATE misiuni m
+SET title = v.mission_title,
+    description = v.mission_description
+FROM (
+    VALUES
+        ('Primaria Arad', 'Mesajul de la intrare',
+         'Deasupra intrarii principale sta scris un citat celebru. In a cata evanghelie se gaseste acesta?'),
+        ('Parcul Micalaca - Zona 300', 'Curcubeul de lemn',
+         'Priveste curcubeul de lemn prins in sfori. Cate culori diferite au treptele sale orizontale?'),
+        ('Parcul de la Podgoria', 'Chipul unei personalitati',
+         'Printre copaci si in apropierea apei, o statuie pastreaza amintirea unui om care a marcat istoria recenta a Romaniei. Care este suma cifrelor anului nasterii lui?'),
+        ('Parcul Copiilor', 'Drumul spre iesire',
+         'Exista aici un loc in care te poti rataci printre drumuri intortocheate, dar unde rabdarea si atentia te ajuta sa gasesti iesirea. Cate litere are numele pe care il poarta?'),
+        ('Filarmonica', 'Semnul ascuns in parc',
+         'Uita-te in jurul cladirii. Nu este nici drum, nici calator, dar sta pe cinci linii paralele si stabileste regulile de la bun inceput. Se infasoara exact pe a doua linie. Din cate silabe ii este alcatuita denumirea?')
+) AS v(objective_name, mission_title, mission_description)
+JOIN obiective_turistice o
+    ON o.name = v.objective_name
+WHERE m.objective_id = o.objective_id;
+
+-- ==========================================
 -- 5. MISIUNI
 -- ==========================================
 
@@ -225,7 +252,7 @@ FROM (
     (
         'Primaria Arad',
         'Mesajul de la intrare',
-        'Deasupra intrarii principale sta scris un citat celebru. Carei evanghelii ii apartine?',
+        'Deasupra intrarii principale sta scris un citat celebru. In a cata evanghelie se gaseste acesta?',
         20
     ),
     (
@@ -249,7 +276,7 @@ FROM (
     (
         'Filarmonica',
         'Semnul ascuns in parc',
-        'Uita-te in jurul cladirii. Nu este nici drum, nici calator, dar sta pe cinci linii paralele si stabileste regulile de la bun inceput. Se infasoara exact pe a doua linie. Cum se numeste?',
+        'Uita-te in jurul cladirii. Nu este nici drum, nici calator, dar sta pe cinci linii paralele si stabileste regulile de la bun inceput. Se infasoara exact pe a doua linie. Din cate silabe ii este alcatuita denumirea?',
         20
     ),
     (
@@ -263,8 +290,8 @@ FROM (
 
     (
         'Parcul Micalaca - Zona 300',
-        'Gustul unei iesiri in aer liber',
-        'Nu doar plimbarile si sportul te asteapta aici. Parcul a fost amenajat si pentru cei care prefera sa petreaca timp in aer liber, la un gratar cu prietenii. Cate locuri pentru gratar au fost prevazute in parc?',
+        'Curcubeul de lemn',
+        'Priveste curcubeul de lemn prins in sfori. Cate culori diferite au treptele sale orizontale?',
         20
     ),
     (
@@ -276,13 +303,13 @@ FROM (
     (
         'Parcul de la Podgoria',
         'Chipul unei personalitati',
-        'Printre copaci si in apropierea apei, o statuie pastreaza amintirea unui om care a marcat istoria recenta a Romaniei. Care este numele personalitatii reprezentate?',
+        'Printre copaci si in apropierea apei, o statuie pastreaza amintirea unui om care a marcat istoria recenta a Romaniei. Care este suma cifrelor anului nasterii lui?',
         20
     ),
     (
         'Parcul Copiilor',
         'Drumul spre iesire',
-        'Exista un loc in care te poti rataci printre drumuri intortocheate, dar unde rabdarea si atentia te ajuta sa gasesti iesirea. Cum se numeste?',
+        'Exista aici un loc in care te poti rataci printre drumuri intortocheate, dar unde rabdarea si atentia te ajuta sa gasesti iesirea. Cate litere are numele pe care il poarta?',
         20
     ),
     (
@@ -304,6 +331,19 @@ WHERE NOT EXISTS (
 -- 6. RASPUNSURI CORECTE ACCEPTATE
 -- ==========================================
 
+-- The accepted answers of these eleven missions are exactly the list below.
+-- Old answers (for example from before the route files) are removed, so they are no longer accepted.
+DELETE FROM raspunsuri_corecte
+WHERE mission_id IN (
+    SELECT mission_id FROM misiuni
+    WHERE title IN (
+        'Mesajul de la intrare', 'Poetul din umbra scenei', 'In jurul zidurilor',
+        'Doua destine, un numar', 'Semnul ascuns in parc', 'Trei urme ale timpului',
+        'Curcubeul de lemn', 'Adaposturi printre copaci', 'Chipul unei personalitati',
+        'Drumul spre iesire', 'Jocul de pe faleza'
+    )
+);
+
 INSERT INTO raspunsuri_corecte
 (mission_id, accepted_answer)
 SELECT
@@ -311,16 +351,16 @@ SELECT
     v.accepted_answer
 FROM (
     VALUES
-        ('Mesajul de la intrare', 'Ioan'),
+        ('Mesajul de la intrare', '4'),
         ('Poetul din umbra scenei', '2'),
         ('In jurul zidurilor', '5'),
         ('Doua destine, un numar', '77'),
-        ('Semnul ascuns in parc', 'cheia sol'),
+        ('Semnul ascuns in parc', '3'),
         ('Trei urme ale timpului', '3'),
-        ('Gustul unei iesiri in aer liber', '10'),
-        ('Adaposturi printre copaci', '3'),
-        ('Chipul unei personalitati', 'Coposu'),
-        ('Drumul spre iesire', 'labirint'),
+        ('Curcubeul de lemn', '4'),
+        ('Adaposturi printre copaci', '5'),
+        ('Chipul unei personalitati', '15'),
+        ('Drumul spre iesire', '8'),
         ('Jocul de pe faleza', '4')
 ) AS v(mission_title, accepted_answer)
 JOIN misiuni m

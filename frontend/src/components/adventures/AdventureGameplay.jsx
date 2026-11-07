@@ -14,7 +14,6 @@ export default function AdventureGameplay({
   missionError,
   isOpeningHint,
   handleNextHint,
-  handleOpenVisualHints,
   answer,
   setAnswer,
   isValidating,
@@ -80,14 +79,6 @@ export default function AdventureGameplay({
           </div>
         ) : activeLocation ? (
           <>
-            {/* Fixed location description */}
-
-            <div className="location-description-card">
-              <h3>📍 Discover the Location</h3>
-
-              <p>{activeLocation.locationDescription}</p>
-            </div>
-
             {/* Current location number */}
 
             <div className="clue-number">
@@ -153,32 +144,6 @@ export default function AdventureGameplay({
                     All hints for this location are open.
                   </p>
                 )}
-            </div>
-
-            {/* Visual hints */}
-
-            <div className="visual-hint-container">
-              <div className="visual-hint-copy">
-                <span className="visual-hint-icon">📸</span>
-
-                <div>
-                  <h3>Need a visual hint?</h3>
-
-                  <p>
-                    Explore a few pictures that may help you identify the
-                    location.
-                  </p>
-                </div>
-              </div>
-
-              <button
-                className="visual-hint-button"
-                type="button"
-                onClick={handleOpenVisualHints}
-              >
-                Reveal Photos
-                <span>→</span>
-              </button>
             </div>
 
             {/* Player answer and GPS validation */}

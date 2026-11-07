@@ -114,6 +114,33 @@ export async function getCurrentUser() {
   return data.user;
 }
 
+// Retrieve the profile page data from the database: stats, adventure history, badges, join date.
+// Returns null when nobody is logged in.
+export async function getProfile() {
+  if (USE_MOCK_AUTH) {
+    return null;
+  }
+
+  if (!API_URL) {
+    throw new Error("Authentication server is not configured.");
+  }
+
+  const response = await fetch(`${API_URL}/users/me`, {
+    method: "GET",
+    credentials: "include",
+  });
+
+  if (response.status === 401) {
+    return null;
+  }
+
+  if (!response.ok) {
+    throw new Error("Unable to retrieve your profile.");
+  }
+
+  return response.json();
+}
+
 // End the authenticated session.
 export async function logoutUser() {
   if (USE_MOCK_AUTH) {

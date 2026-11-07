@@ -4,7 +4,6 @@ import { useNavigate, useParams } from "react-router-dom";
 
 import "../styles/AdventureDetailsPage.css";
 import Sidebar from "../layout/Sidebar.jsx";
-import { historyImages } from "../data/historyImages.js";
 import { getOrderedLocations } from "../utils/generateAdventureRoute.js";
 import {
   getCurrentPosition,
@@ -19,8 +18,6 @@ import natureImage from "../../assets/images/backgrounds/nature-adventure.JPG";
 import historyImage from "../../assets/images/backgrounds/history-adventure.JPG";
 
 import AdventureGameplay from "../adventures/AdventureGameplay.jsx";
-import VisualHintCarousel from "../adventures/VisualHintCarousel.jsx";
-
 // Temporary adventure data.
 // Locations will eventually be loaded from FastAPI. Riddles and hints come from the server (ai_bot missions).
 const adventureData = {
@@ -36,7 +33,7 @@ const adventureData = {
 
     icon: "🌿",
 
-    points: 750,
+    points: 200,
 
     // Nature Explorer will contain 4 tourist locations.
     locations: [
@@ -44,21 +41,11 @@ const adventureData = {
         id: "nature-location-1",
 
         name: "Parcul Micălaca – Zona 300",
-
-        // Fixed location description. The riddle and hints come from the server.
-        locationDescription:
-          "La marginea cartierului Micălaca, acolo unde orașul " +
-          "se întâlnește cu faleza Mureșului, se întinde un " +
-          "spațiu verde modern. Alei, terenuri de sport și " +
-          "locuri de joacă îl transformă într-un punct de " +
-          "întâlnire pentru toate vârstele.",
-
-        visualHints: [natureImage, natureImage, natureImage],
       },
 
-      // TODO: Add Nature Location 2 with its photos.
-      // TODO: Add Nature Location 3 with its photos.
-      // TODO: Add Nature Location 4 with its photos.
+      // TODO: Add Nature Location 2.
+      // TODO: Add Nature Location 3.
+      // TODO: Add Nature Location 4.
     ],
   },
 
@@ -83,38 +70,31 @@ const adventureData = {
         id: "primaria-arad",
         name: "Primăria Arad",
         points: 20,
-        locationDescription:
-          "Discover the history and architecture of Arad City Hall.",
       },
       {
         id: "teatrul-ioan-slavici",
         name: "Teatrul Clasic Ioan Slavici",
         points: 20,
-        locationDescription: "Historical location description coming soon.",
       },
       {
         id: "biserica-rosie",
         name: "Biserica Roșie Luterană",
         points: 20,
-        locationDescription: "Historical location description coming soon.",
       },
       {
         id: "moise-nicoara",
         name: "Liceul Național Moise Nicoară",
         points: 30,
-        locationDescription: "Historical location description coming soon.",
       },
       {
         id: "palatul-cultural",
         name: "Palatul Cultural (Filarmonica)",
         points: 20,
-        locationDescription: "Historical location description coming soon.",
       },
       {
         id: "vechiul-cazino",
         name: "Vechiul Cazino",
         points: 20,
-        locationDescription: "Historical location description coming soon.",
       },
     ],
   },
@@ -169,11 +149,6 @@ function AdventureDetailsPage() {
   const activeLocationId =
     gameplayAdventure?.locations[currentLocationIndex]?.id ?? null;
 
-  // Visual hint gallery.
-  const [visualHintOpen, setVisualHintOpen] = useState(false);
-
-  const [visualHintIndex, setVisualHintIndex] = useState(0);
-
   // AI chatbot.
   const [chatOpen, setChatOpen] = useState(false);
 
@@ -195,8 +170,6 @@ function AdventureDetailsPage() {
     setAnswer("");
     setValidationMessage("");
     setValidationType("");
-    setVisualHintOpen(false);
-    setVisualHintIndex(0);
   }
 
   /**
@@ -263,21 +236,6 @@ function AdventureDetailsPage() {
     };
   }, [activeLocationId]);
 
-  // Close the visual hint modal when Escape is pressed.
-  useEffect(() => {
-    const handleEscape = (event) => {
-      if (event.key === "Escape") {
-        setVisualHintOpen(false);
-      }
-    };
-
-    window.addEventListener("keydown", handleEscape);
-
-    return () => {
-      window.removeEventListener("keydown", handleEscape);
-    };
-  }, []);
-
   // Handle invalid adventure IDs.
   if (!adventure) {
     return (
@@ -310,13 +268,6 @@ function AdventureDetailsPage() {
     missionState?.locationId === activeLocationId ? missionState.data : null;
   const missionError =
     missionState?.locationId === activeLocationId ? missionState.error : "";
-
-  // Retrieve visual hints for the active location.
-  // History locations use their photos; nature locations use their own images.
-  const visualHintImages =
-    adventureId === "history"
-      ? historyImages[activeLocation?.id]?.clues || []
-      : activeLocation?.visualHints || [];
 
   /**
    * Open the next hint for the active location. It is optional and costs points,
@@ -358,15 +309,6 @@ function AdventureDetailsPage() {
     } finally {
       setIsOpeningHint(false);
     }
-  };
-
-  // Open the visual hint gallery.
-  const handleOpenVisualHints = () => {
-    if (visualHintImages.length === 0) return;
-
-    setVisualHintIndex(0);
-
-    setVisualHintOpen(true);
   };
 
   /**
@@ -487,7 +429,6 @@ function AdventureDetailsPage() {
             missionError={missionError}
             isOpeningHint={isOpeningHint}
             handleNextHint={handleNextHint}
-            handleOpenVisualHints={handleOpenVisualHints}
             answer={answer}
             setAnswer={setAnswer}
             isValidating={isValidating}
@@ -500,15 +441,6 @@ function AdventureDetailsPage() {
           />
         )}
       </main>
-
-      {/* Visual hint gallery */}
-      <VisualHintCarousel
-        images={visualHintImages}
-        isOpen={visualHintOpen}
-        activeIndex={visualHintIndex}
-        onIndexChange={setVisualHintIndex}
-        onClose={() => setVisualHintOpen(false)}
-      />
     </div>
   );
 }

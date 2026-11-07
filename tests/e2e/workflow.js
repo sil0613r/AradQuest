@@ -10,6 +10,8 @@ const check = (name, ok, detail = "") => {
 
 // Places used for GPS checks
 const FAR_FROM_MICALACA = { latitude: 44.4268, longitude: 26.1025 }; // Bucharest
+// Set by scripts/local.sh --no-gps: the server accepts answers from any place, so "far away" is not tested.
+const NO_GPS = process.env.NO_GPS === "1";
 const AT_MICALACA = { latitude: 46.1678101, longitude: 21.3421142 }; // Parcul Micalaca - Zona 300
 
 (async () => {
@@ -108,11 +110,15 @@ const AT_MICALACA = { latitude: 46.1678101, longitude: 21.3421142 }; // Parcul M
       return page.locator(".clue-validation-message").innerText().catch(() => "");
     };
 
-    // 4a. Far away: refused, nothing saved
-    let message = await verify("10");
-    check("far from the place: refused with distance", message.toLowerCase().includes("away"), message);
-    let progress = await (await context.request.get(`${SITE}/api/progress`)).json();
-    check("nothing saved when far away", progress.completedLocations.length === 0, JSON.stringify(progress));
+    // 4a. Far away: refused, nothing saved. Skipped in --no-gps mode (the server accepts any place there).
+    let message = "";
+    let progress = null;
+    if (!NO_GPS) {
+      message = await verify("10");
+      check("far from the place: refused with distance", message.toLowerCase().includes("away"), message);
+      progress = await (await context.request.get(`${SITE}/api/progress`)).json();
+      check("nothing saved when far away", progress.completedLocations.length === 0, JSON.stringify(progress));
+    }
 
     // 4b. At the place, wrong answer
     await context.setGeolocation(AT_MICALACA);
@@ -121,7 +127,7 @@ const AT_MICALACA = { latitude: 46.1678101, longitude: 21.3421142 }; // Parcul M
 
     // 4c. At the place, right answer (with a space and different case to test normalization)
     // Once completed, the screen switches to its finished view, so check the saved result instead of a message.
-    await verify(" 10 ");
+    await verify(" 4 ");
     progress = await (await context.request.get(`${SITE}/api/progress`)).json();
     check("right place, right answer: saved as completed with points", progress.completedLocations.includes("nature-location-1") && progress.totalPoints === 20, JSON.stringify(progress));
 

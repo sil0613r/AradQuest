@@ -41,6 +41,8 @@ SESSION_SECRET = _required("SESSION_SECRET")      # long random string, signs th
 
 ALLOWED_ORIGINS = [o.strip() for o in os.getenv("ALLOWED_ORIGINS", "http://localhost:5173").split(",") if o.strip()]
 COOKIE_SECURE = os.getenv("COOKIE_SECURE", "false").lower() == "true"   # true on HTTPS deployments
+# false = test mode (scripts/local.sh --no-gps): answers are accepted from any place. Never set it in production.
+GPS_CHECK_ENABLED = os.getenv("GPS_CHECK_ENABLED", "true").strip().lower() != "false"
 SESSION_MAX_AGE_SECONDS = 7 * 24 * 60 * 60
 
 # The chatbot service holds the mission texts and hints (ai_bot/backend/missions.json).
