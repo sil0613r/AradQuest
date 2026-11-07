@@ -1,0 +1,856 @@
+@import url("https://fonts.googleapis.com/css2?family=Nunito:wght@400;500;600;700;800&family=Playfair+Display:wght@600;700&display=swap");
+
+:root {
+  --cream: #f1e2c9;
+  --dark: #211d17;
+  --gold: #d99b35;
+  --brown: #76502b;
+  --text: #29251f;
+}
+
+* {
+  box-sizing: border-box;
+}
+
+.home-page {
+  min-height: 100vh;
+  display: flex;
+
+  color: var(--text);
+  font-family: "Nunito", sans-serif;
+}
+
+/* SIDEBAR */
+
+.desktop-sidebar {
+  width: 185px;
+  min-height: 100vh;
+  flex-shrink: 0;
+  background: var(--dark);
+  color: white;
+  display: flex;
+  flex-direction: column;
+  padding: 20px 12px;
+}
+
+.sidebar-logo {
+  height: 125px;
+  display: flex;
+  justify-content: center;
+  align-items: flex-start;
+  margin-bottom: 20px;
+}
+
+.sidebar-logo img {
+  width: 125px;
+  height: 110px;
+  object-fit: contain;
+}
+
+.sidebar-navigation {
+  display: flex;
+  flex-direction: column;
+  gap: 7px;
+}
+
+.nav-item {
+  width: 100%;
+  border: none;
+  background: transparent;
+  color: white;
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  padding: 11px 10px;
+  border-radius: 9px;
+  font-family: inherit;
+  font-size: 14px;
+  text-align: left;
+  cursor: pointer;
+  transition: 0.2s;
+}
+
+.nav-item:hover,
+.nav-item.active {
+  background: #775020;
+}
+
+.nav-icon {
+  font-size: 21px;
+  width: 22px;
+  text-align: center;
+}
+
+.sidebar-bottom {
+  margin-top: auto;
+  padding-bottom: 35px;
+}
+
+.sidebar-city {
+  min-height: 90px;
+  display: flex;
+  align-items: flex-end;
+  justify-content: center;
+  color: #e6b65e;
+  font-size: 11px;
+  font-weight: 800;
+}
+
+/* MAIN CONTENT */
+
+.home-main {
+  flex: 1;
+  min-width: 0;
+  padding: 15px 4.5%;
+}
+
+/* HEADER */
+
+.home-header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  margin-bottom: 18px;
+  min-height: 52px;
+}
+
+.welcome-section,
+.header-actions {
+  display: flex;
+  align-items: center;
+}
+
+.welcome-section {
+  gap: 15px;
+}
+
+.user-avatar-image {
+  width: 55px;
+  height: 55px;
+  object-fit: contain;
+  border-radius: 50%;
+  display: block;
+}
+.user-avatar {
+  width: 78px;
+  height: 78px;
+  background: #e9c69b;
+  border-radius: 50%;
+  display: grid;
+  place-items: center;
+  font-size: 42px;
+  border: 3px solid #ead9c1;
+}
+
+.welcome-section h1 {
+  font-size: 26px;
+  margin: 0;
+  font-weight: 800;
+}
+
+.welcome-section p {
+  margin: 2px 0 0;
+  font-size: 15px;
+  color: #625b52;
+}
+
+.header-actions {
+  gap: 24px;
+}
+
+.points-badge {
+  display: flex;
+  align-items: center;
+  gap: 9px;
+  padding: 8px 15px;
+  border: 1px solid #eadfce;
+  border-radius: 30px;
+  background: #fffaf2;
+}
+
+.points-badge > span {
+  font-size: 21px;
+}
+
+.points-badge strong,
+.points-badge small {
+  display: block;
+  text-align: center;
+}
+
+.points-badge small {
+  font-size: 10px;
+}
+
+.notification-button {
+  border: none;
+  background: none;
+  font-size: 24px;
+  cursor: pointer;
+}
+
+.header-profile {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  border: none;
+  background: none;
+  cursor: pointer;
+  font-family: inherit;
+}
+
+.header-profile span:first-child {
+  font-size: 27px;
+}
+
+.hamburger-button {
+  display: none;
+}
+
+/* HERO BANNER */
+
+.hero-banner {
+  min-height: 155px;
+  border-radius: 15px;
+  overflow: hidden;
+  display: flex;
+  align-items: center;
+  padding: 25px 35px;
+  color: white;
+  background:
+    linear-gradient(90deg, rgba(20, 17, 13, 0.82), rgba(20, 17, 13, 0.05)),
+    url("/src/assets/images/backgrounds/hero.JPG") center 50% / cover,
+    #654b31;
+}
+
+.hero-content {
+  display: flex;
+  align-items: center;
+  gap: 20px;
+}
+
+.hero-compass {
+  font-size: 53px;
+}
+
+.hero-content h2 {
+  font-family: "Playfair Display", serif;
+  font-size: 35px;
+  font-style: italic;
+  margin: 0;
+}
+
+.hero-content p {
+  font-size: 18px;
+  margin: 2px 0 12px;
+}
+
+.hero-tagline {
+  display: inline-block;
+  padding: 7px 19px;
+  background: #e7a92e;
+  color: #211d17;
+  border-radius: 25px;
+  font-weight: 800;
+  transform: rotate(-2deg);
+}
+
+/* ADVENTURE CARDS */
+
+.adventure-section {
+  margin-top: 15px;
+}
+
+.adventure-section > h2 {
+  font-size: 22px;
+  margin: 0 0 10px;
+  font-weight: 800;
+}
+
+.adventure-grid {
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: 15px;
+}
+
+.adventure-card {
+  min-height: 250px;
+  border-radius: 18px;
+  padding: 22px 28px;
+  display: flex;
+  flex-direction: column;
+  justify-content: space-between;
+  color: white;
+  overflow: hidden;
+  background-size: cover;
+  background-position: center;
+  background-repeat: no-repeat;
+  position: relative;
+  transition:
+    transform 0.25s ease,
+    box-shadow 0.25s ease;
+}
+
+.adventure-card:hover {
+  transform: translateY(-4px);
+  box-shadow: 0 10px 25px rgba(65, 43, 20, 0.18);
+}
+
+.nature-card {
+  background-image:
+    linear-gradient(90deg, rgba(13, 35, 19, 0.75), rgba(13, 35, 19, 0.05)),
+    url("/src/assets/images/backgrounds/nature-adventure.JPG");
+  background-color: #345b3a;
+}
+
+.history-card {
+  background-image:
+    linear-gradient(90deg, rgba(60, 31, 12, 0.78), rgba(60, 31, 12, 0.08)),
+    url("/src/assets/images/backgrounds/history-adventure.JPG");
+  background-color: #795033;
+}
+.nature-card p,
+.history-card p {
+  color: #ffffff !important;
+}
+
+.category-icon {
+  width: 47px;
+  height: 47px;
+  display: grid;
+  place-items: center;
+  border: 2px solid rgba(255, 255, 255, 0.7);
+  background: rgba(255, 255, 255, 0.16);
+  border-radius: 50%;
+  font-size: 24px;
+}
+
+.adventure-card-content {
+  max-width: 280px;
+}
+
+.adventure-card h3 {
+  font-family: "Playfair Display", serif;
+  font-size: 27px;
+  font-style: italic;
+  font-weight: 700;
+  margin: 0 0 8px;
+  color: white !important;
+}
+.adventure-card .adventure-card-content p {
+  display: block;
+  visibility: visible;
+  color: #ffffff !important;
+  font-size: 14px;
+  font-weight: 600;
+  line-height: 1.6;
+  margin: 8px 0 14px;
+  opacity: 1 !important;
+
+  text-shadow: 0 2px 5px rgba(0, 0, 0, 0.9);
+
+  background: rgba(20, 20, 20, 0.35);
+  padding: 6px 9px;
+  border-radius: 6px;
+}
+/* Force white text on adventure card descriptions */
+.adventure-card .adventure-card-content p {
+  color: #ffffff !important;
+}
+.adventure-card button {
+  border: 1px solid white;
+  border-radius: 25px;
+  padding: 7px 17px;
+  background: rgba(255, 255, 255, 0.13);
+  color: white;
+  font-family: inherit;
+  font-weight: 700;
+  cursor: pointer;
+}
+
+.adventure-card button:hover {
+  background: white;
+  color: #302619;
+}
+
+/* PROGRESS AND REWARDS */
+
+.dashboard-bottom {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 15px;
+  margin-top: 17px;
+}
+
+.progress-panel,
+.rewards-panel {
+  background: rgba(255, 255, 255, 0.38);
+  border: 1px solid rgba(255, 255, 255, 0.75);
+  border-radius: 13px;
+  padding: 15px;
+  min-width: 0;
+  box-shadow: 0 4px 15px rgba(103, 77, 45, 0.04);
+  backdrop-filter: blur(8px);
+}
+
+.progress-panel h3,
+.rewards-panel h3 {
+  margin: 0;
+  font-size: 15px;
+}
+
+.progress-stats {
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+  margin-top: 17px;
+}
+
+.stat-item {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  gap: 9px;
+  border-right: 1px solid #e7ddcf;
+}
+
+.stat-item:last-child {
+  border: none;
+}
+
+.stat-icon {
+  font-size: 27px;
+  color: var(--gold);
+}
+
+.stat-item strong,
+.stat-item small {
+  display: block;
+}
+
+.stat-item strong {
+  font-size: 19px;
+}
+
+.stat-item small {
+  font-size: 10px;
+}
+
+.panel-heading {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  margin-bottom: 12px;
+}
+
+.panel-heading button {
+  border: none;
+  background: none;
+  cursor: pointer;
+  font-family: inherit;
+  font-size: 11px;
+}
+
+.rewards-list {
+  display: grid;
+  grid-template-columns: repeat(3, minmax(0, 1fr));
+  gap: 8px;
+}
+
+.reward-card {
+  min-width: 0;
+  display: flex;
+  align-items: center;
+  gap: 7px;
+  background: #fffaf2;
+  border: 1px solid #eee2d2;
+  border-radius: 10px;
+  padding: 9px 6px;
+  position: relative;
+}
+
+.reward-icon {
+  font-size: 25px;
+}
+
+.reward-card strong,
+.reward-card small {
+  display: block;
+}
+
+.reward-card strong {
+  font-size: 10px;
+}
+
+.reward-card small {
+  font-size: 9px;
+}
+
+.reward-lock {
+  position: absolute;
+  right: 5px;
+  bottom: 3px;
+  font-size: 10px;
+}
+
+/* MOBILE MENU */
+
+.mobile-menu-overlay {
+  display: none;
+}
+
+/* AI CHAT BUTTON */
+
+.ai-chat-button {
+  position: fixed;
+  right: 25px;
+  bottom: 25px;
+  width: 65px;
+  height: 65px;
+  border: 2px solid #e4c28d;
+  border-radius: 50%;
+  background: #f1e2c9;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  cursor: pointer;
+  box-shadow: 0 5px 18px rgba(0, 0, 0, 0.22);
+  z-index: 1000;
+}
+.ai-chat-button img {
+  width: 90%;
+  height: 90%;
+  object-fit: contain;
+}
+
+.chat-close-icon {
+  font-size: 25px;
+  color: #30271e;
+}
+
+.ai-chat-window {
+  position: fixed;
+  right: 25px;
+  bottom: 95px;
+  width: 340px;
+  height: 420px;
+  max-height: calc(100vh - 120px);
+  background: #fffaf2;
+  border: 1px solid #e8d9c3;
+  border-radius: 16px;
+  box-shadow: 0 8px 30px rgba(0, 0, 0, 0.2);
+  z-index: 999;
+  display: flex;
+  flex-direction: column;
+  overflow: hidden;
+}
+
+.ai-chat-header {
+  background: #30271e;
+  color: white;
+  padding: 15px;
+  display: flex;
+  justify-content: space-between;
+}
+
+.ai-chat-header strong,
+.ai-chat-header small {
+  display: block;
+}
+
+.ai-chat-header small {
+  color: #e5cba3;
+  font-size: 11px;
+}
+
+.ai-chat-header button {
+  background: none;
+  color: white;
+  border: none;
+  cursor: pointer;
+}
+
+.ai-chat-messages {
+  flex: 1;
+  padding: 15px;
+}
+
+.ai-chat-input {
+  display: flex;
+  padding: 10px;
+  gap: 8px;
+  border-top: 1px solid #e8d9c3;
+}
+
+.ai-chat-input input {
+  flex: 1;
+  min-width: 0;
+  border: 1px solid #e8d9c3;
+  border-radius: 20px;
+  padding: 10px;
+  outline: none;
+}
+
+.ai-chat-input button {
+  background: #775020;
+  color: white;
+  border: none;
+  border-radius: 50%;
+  width: 38px;
+  cursor: pointer;
+}
+
+.bot-message {
+  background: #f0e5d4;
+  padding: 12px;
+  border-radius: 12px;
+  font-size: 13px;
+  line-height: 1.5;
+}
+
+/* RESPONSIVE DESIGN */
+
+@media (max-width: 1050px) {
+  .desktop-sidebar {
+    width: 160px;
+  }
+
+  .home-main {
+    padding: 15px 2.5%;
+  }
+
+  .dashboard-bottom {
+    grid-template-columns: 1fr;
+  }
+}
+
+@media (max-width: 700px) {
+  .desktop-sidebar {
+    display: none;
+  }
+
+  .home-main {
+    width: 100%;
+    padding: 15px;
+  }
+
+  .home-header {
+    position: relative;
+    padding-right: 45px;
+    min-height: 55px;
+  }
+
+  .user-avatar {
+    width: 53px;
+    height: 53px;
+    font-size: 29px;
+  }
+
+  .welcome-section {
+    gap: 9px;
+  }
+
+  .welcome-section h1 {
+    font-size: 19px;
+  }
+
+  .welcome-section p {
+    font-size: 11px;
+  }
+
+  .header-actions {
+    display: none;
+  }
+
+  .hamburger-button {
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    gap: 5px;
+    position: absolute;
+    right: 0;
+    top: 8px;
+    width: 38px;
+    height: 38px;
+    background: #30271e;
+    border: none;
+    border-radius: 8px;
+    padding: 8px;
+    cursor: pointer;
+  }
+
+  .hamburger-button span {
+    height: 2px;
+    width: 100%;
+    background: white;
+    border-radius: 5px;
+  }
+
+  .hero-banner {
+    min-height: 150px;
+    padding: 18px;
+    background-position: center;
+  }
+
+  .hero-content {
+    gap: 10px;
+  }
+
+  .hero-compass {
+    font-size: 35px;
+  }
+
+  .hero-content h2 {
+    font-size: 25px;
+  }
+
+  .hero-content p {
+    font-size: 13px;
+  }
+
+  .hero-tagline {
+    font-size: 11px;
+  }
+
+  .adventure-section > h2 {
+    font-size: 19px;
+  }
+
+  .adventure-grid {
+    grid-template-columns: 1fr;
+  }
+
+  .adventure-card {
+    min-height: 190px;
+  }
+
+  .dashboard-bottom {
+    grid-template-columns: 1fr;
+  }
+
+  .progress-stats {
+    gap: 3px;
+  }
+
+  .stat-item {
+    gap: 5px;
+  }
+
+  .stat-icon {
+    font-size: 21px;
+  }
+
+  .stat-item strong {
+    font-size: 16px;
+  }
+
+  .rewards-list {
+    grid-template-columns: 1fr;
+  }
+
+  .reward-card {
+    min-height: 55px;
+  }
+
+  /* Right-side sliding menu */
+
+  .mobile-menu-overlay {
+    display: block;
+    position: fixed;
+    inset: 0;
+    background: rgba(0, 0, 0, 0.48);
+    z-index: 1100;
+  }
+
+  .mobile-menu {
+    position: absolute;
+    right: 0;
+    top: 0;
+    width: min(290px, 85%);
+    height: 100%;
+    background: #211d17;
+    color: white;
+    padding: 22px 16px;
+    animation: slideMenu 0.25s ease;
+    overflow-y: auto;
+  }
+
+  @keyframes slideMenu {
+    from {
+      transform: translateX(100%);
+    }
+    to {
+      transform: translateX(0);
+    }
+  }
+
+  .mobile-menu-header {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    margin-bottom: 25px;
+  }
+
+  .mobile-menu-header h2 {
+    color: #e6b65e;
+    font-size: 20px;
+  }
+
+  .mobile-menu-header button {
+    color: white;
+    background: none;
+    border: none;
+    font-size: 21px;
+    cursor: pointer;
+  }
+
+  .mobile-user {
+    display: flex;
+    align-items: center;
+    gap: 12px;
+    padding: 13px;
+    background: #3b3023;
+    border-radius: 10px;
+    margin-bottom: 22px;
+  }
+
+  .mobile-user > span {
+    font-size: 32px;
+  }
+
+  .mobile-user strong,
+  .mobile-user small {
+    display: block;
+  }
+
+  .mobile-user small {
+    color: #e6b65e;
+  }
+
+  .mobile-menu nav {
+    display: flex;
+    flex-direction: column;
+    gap: 8px;
+  }
+
+  .ai-chat-button {
+    right: 17px;
+    bottom: 17px;
+    width: 53px;
+    height: 53px;
+  }
+
+  .ai-chat-window {
+    right: 12px;
+    bottom: 82px;
+    width: calc(100% - 24px);
+    height: min(420px, calc(100dvh - 110px));
+  }
+}
+
+/* HOME PAGE - white adventure descriptions */
+.home-page .adventure-card .adventure-card-content p {
+  color: #ffffff !important;
+  -webkit-text-fill-color: #ffffff !important;
+  opacity: 1 !important;
+  text-shadow: 0 2px 5px rgba(0, 0, 0, 0.9);
+}

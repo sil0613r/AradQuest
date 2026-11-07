@@ -1,0 +1,911 @@
+@import url("https://fonts.googleapis.com/css2?family=Nunito:wght@400;500;600;700;800&family=Playfair+Display:wght@600;700&display=swap");
+
+:root {
+  --rewards-cream: #f1e2c9;
+  --rewards-dark: #211d17;
+  --rewards-gold: #d99b35;
+  --rewards-brown: #76502b;
+  --rewards-text: #29251f;
+}
+
+/* PAGE */
+
+.rewards-page {
+  min-height: 100vh;
+  display: flex;
+  background: linear-gradient(135deg, #f8eedc, #f1dfc1);
+  color: var(--rewards-text);
+  font-family: "Nunito", sans-serif;
+}
+
+/* SIDEBAR */
+
+.rewards-sidebar {
+  width: 200px;
+  min-height: 100vh;
+  flex-shrink: 0;
+  display: flex;
+  flex-direction: column;
+  padding: 20px 12px;
+  background: var(--rewards-dark);
+  color: white;
+}
+
+.rewards-sidebar-logo {
+  height: 145px;
+  display: flex;
+  justify-content: center;
+  align-items: flex-start;
+  margin-bottom: 20px;
+}
+
+.rewards-sidebar-logo img {
+  width: 135px;
+  height: 120px;
+  object-fit: contain;
+}
+
+.rewards-sidebar-navigation {
+  display: flex;
+  flex-direction: column;
+  gap: 7px;
+}
+
+.rewards-nav-item {
+  width: 100%;
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  padding: 12px 10px;
+  border: none;
+  border-radius: 9px;
+  background: transparent;
+  color: white;
+  font-family: inherit;
+  font-size: 14px;
+  text-align: left;
+  cursor: pointer;
+  transition: 0.2s ease;
+}
+
+.rewards-nav-item:hover,
+.rewards-nav-item.active {
+  background: #775020;
+}
+
+.rewards-nav-icon {
+  width: 22px;
+  font-size: 21px;
+  text-align: center;
+}
+
+.rewards-sidebar-bottom {
+  margin-top: auto;
+  padding: 30px 5px;
+  color: #e6b65e;
+  font-size: 11px;
+  font-weight: 800;
+  text-align: center;
+}
+
+/* MAIN */
+
+.rewards-main {
+  flex: 1;
+  min-width: 0;
+  padding: 30px 4.5%;
+}
+
+/* HEADER */
+
+.rewards-page-header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 20px;
+  margin-bottom: 25px;
+}
+
+.rewards-eyebrow {
+  color: #a17a35;
+  font-size: 11px;
+  font-weight: 800;
+  letter-spacing: 2px;
+}
+
+.rewards-page-header h1 {
+  margin: 5px 0;
+  font-family: "Playfair Display", serif;
+  font-size: clamp(28px, 3vw, 38px);
+  font-style: italic;
+}
+
+.rewards-page-header p {
+  margin: 0;
+  color: #756858;
+  font-size: 14px;
+}
+
+.rewards-profile-button {
+  padding: 11px 20px;
+  border: 1px solid #d6b77f;
+  border-radius: 25px;
+  background: #fffaf2;
+  color: #76502b;
+  font-family: inherit;
+  font-weight: 800;
+  cursor: pointer;
+  transition: 0.2s ease;
+}
+
+.rewards-profile-button:hover {
+  background: #e8c887;
+  transform: translateY(-2px);
+}
+
+/* POINTS BALANCE */
+
+.rewards-balance-card {
+  position: relative;
+  overflow: hidden;
+  border: 1px solid rgba(155, 119, 65, 0.15);
+  border-radius: 22px;
+  background: linear-gradient(
+    110deg,
+    rgba(33, 29, 23, 0.97),
+    rgba(73, 50, 28, 0.93)
+  );
+  box-shadow: 0 7px 20px rgba(65, 43, 20, 0.12);
+}
+
+.rewards-balance-content {
+  position: relative;
+  z-index: 1;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 25px;
+  padding: 32px 38px;
+}
+
+.rewards-balance-text {
+  flex: 1;
+  min-width: 0;
+}
+
+.rewards-balance-label {
+  color: #e5b95e;
+  font-size: 11px;
+  font-weight: 800;
+  letter-spacing: 1.5px;
+}
+
+.rewards-balance-text h2 {
+  margin: 12px 0 8px;
+  color: #fff8e9;
+  font-family: "Playfair Display", serif;
+  font-size: clamp(35px, 4vw, 48px);
+}
+
+.rewards-balance-text p {
+  margin: 0;
+  color: #e0d2be;
+  font-size: 13px;
+}
+
+.rewards-explore-button {
+  display: inline-flex;
+  align-items: center;
+  gap: 12px;
+  margin-top: 22px;
+  padding: 11px 18px;
+  border: 1px solid #d9ad5b;
+  border-radius: 25px;
+  background: #d99b35;
+  color: #211d17;
+  font-family: inherit;
+  font-size: 12px;
+  font-weight: 800;
+  cursor: pointer;
+  transition: 0.2s ease;
+}
+
+.rewards-explore-button:hover {
+  background: #f0c56d;
+  transform: translateY(-2px);
+}
+
+.rewards-explore-button span {
+  font-size: 17px;
+}
+
+.rewards-treasure-illustration {
+  position: relative;
+  width: 175px;
+  height: 175px;
+  flex-shrink: 0;
+  display: grid;
+  place-items: center;
+}
+
+.rewards-treasure-circle {
+  width: 135px;
+  height: 135px;
+  display: grid;
+  place-items: center;
+  border: 2px solid rgba(229, 185, 94, 0.45);
+  border-radius: 50%;
+  background: rgba(255, 255, 255, 0.08);
+  box-shadow: 0 0 35px rgba(217, 155, 53, 0.12);
+}
+
+.rewards-treasure-circle span {
+  font-size: 65px;
+}
+
+.rewards-sparkle {
+  position: absolute;
+  color: #e5b95e;
+}
+
+.sparkle-one {
+  top: 10px;
+  left: 15px;
+  font-size: 24px;
+}
+
+.sparkle-two {
+  top: 35px;
+  right: 5px;
+  font-size: 30px;
+}
+
+.sparkle-three {
+  bottom: 10px;
+  left: 20px;
+  font-size: 20px;
+}
+
+.rewards-balance-decoration {
+  position: absolute;
+  right: -70px;
+  bottom: -100px;
+  width: 250px;
+  height: 250px;
+  border: 1px solid rgba(229, 185, 94, 0.15);
+  border-radius: 50%;
+}
+
+/* SECTION HEADINGS */
+
+.rewards-available-section,
+.rewards-claimed-section {
+  margin-top: 32px;
+}
+
+.rewards-section-heading {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 15px;
+  margin-bottom: 18px;
+}
+
+.rewards-section-eyebrow {
+  color: #a17a35;
+  font-size: 10px;
+  font-weight: 800;
+  letter-spacing: 1.5px;
+}
+
+.rewards-section-heading h2 {
+  margin: 4px 0;
+  font-family: "Playfair Display", serif;
+  font-size: 24px;
+  font-style: italic;
+}
+
+.rewards-section-heading p {
+  margin: 0;
+  color: #857867;
+  font-size: 13px;
+}
+
+.rewards-count {
+  padding: 7px 12px;
+  border: 1px solid #e0c99f;
+  border-radius: 20px;
+  background: rgba(255, 250, 242, 0.7);
+  color: #8b6427;
+  font-size: 11px;
+  font-weight: 800;
+  white-space: nowrap;
+}
+
+/* AVAILABLE REWARDS GRID */
+
+.rewards-grid {
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: 17px;
+}
+
+.rewards-card {
+  display: flex;
+  flex-direction: column;
+  min-width: 0;
+  padding: 22px;
+  border: 1px solid rgba(255, 255, 255, 0.75);
+  border-radius: 17px;
+  background: rgba(255, 255, 255, 0.48);
+  box-shadow: 0 4px 15px rgba(103, 77, 45, 0.04);
+  transition: 0.2s ease;
+}
+
+.rewards-card:hover {
+  transform: translateY(-4px);
+  box-shadow: 0 8px 22px rgba(103, 77, 45, 0.1);
+  background: rgba(255, 255, 255, 0.65);
+}
+
+.rewards-card-top {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+}
+
+.rewards-category {
+  padding: 5px 10px;
+  border-radius: 20px;
+  background: #f3e5cb;
+  color: #8b6427;
+  font-size: 10px;
+  font-weight: 800;
+}
+
+.rewards-card-star {
+  color: #d99b35;
+  font-size: 20px;
+}
+
+.rewards-card-icon {
+  width: 65px;
+  height: 65px;
+  display: grid;
+  place-items: center;
+  margin-top: 18px;
+  border: 2px solid rgba(217, 155, 53, 0.25);
+  border-radius: 50%;
+  background: #fff8e9;
+  font-size: 32px;
+}
+
+.reward-coffee .rewards-card-icon,
+.rewards-claimed-icon.reward-coffee {
+  background: #e6efdc;
+}
+
+.reward-ticket .rewards-card-icon,
+.rewards-claimed-icon.reward-ticket {
+  background: #e2eaf6;
+}
+
+.reward-sweet .rewards-card-icon,
+.rewards-claimed-icon.reward-sweet {
+  background: #fff0cb;
+}
+
+.reward-gold .rewards-card-icon,
+.rewards-claimed-icon.reward-gold {
+  background: #f4dfac;
+}
+
+.rewards-card h3 {
+  margin: 14px 0 6px;
+  font-family: "Playfair Display", serif;
+  font-size: 19px;
+  font-style: italic;
+}
+
+.rewards-card-description {
+  min-height: 42px;
+  margin: 0;
+  color: #857867;
+  font-size: 12px;
+  line-height: 1.6;
+}
+
+.rewards-card-footer {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  flex-wrap: wrap;
+  gap: 12px;
+  margin-top: 20px;
+  padding-top: 15px;
+  border-top: 1px solid rgba(139, 100, 39, 0.15);
+}
+
+.rewards-cost {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  color: #8b6427;
+}
+
+.rewards-cost span {
+  font-size: 17px;
+}
+
+.rewards-cost strong {
+  font-family: "Playfair Display", serif;
+  font-size: 17px;
+}
+
+.rewards-redeem-button {
+  padding: 9px 14px;
+  border: 1px solid #d6b77f;
+  border-radius: 22px;
+  background: #775020;
+  color: white;
+  font-family: inherit;
+  font-size: 11px;
+  font-weight: 800;
+  cursor: pointer;
+  transition: 0.2s ease;
+}
+
+.rewards-redeem-button:hover:not(:disabled) {
+  background: #966c2e;
+  transform: translateY(-2px);
+}
+
+.rewards-redeem-button.disabled,
+.rewards-redeem-button:disabled {
+  border-color: #d7cbb8;
+  background: #e5d9c7;
+  color: #958675;
+  cursor: not-allowed;
+}
+
+/* CLAIMED REWARDS */
+
+.rewards-claimed-list {
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+}
+
+.rewards-claimed-card {
+  display: flex;
+  align-items: center;
+  gap: 17px;
+  padding: 18px;
+  border: 1px solid rgba(255, 255, 255, 0.75);
+  border-radius: 15px;
+  background: rgba(255, 255, 255, 0.45);
+  transition: 0.2s ease;
+}
+
+.rewards-claimed-card:hover {
+  background: rgba(255, 255, 255, 0.65);
+}
+
+.rewards-claimed-icon {
+  width: 60px;
+  height: 60px;
+  flex-shrink: 0;
+  display: grid;
+  place-items: center;
+  border: 2px solid rgba(217, 155, 53, 0.25);
+  border-radius: 13px;
+  font-size: 28px;
+}
+
+.rewards-claimed-info {
+  flex: 1;
+  min-width: 0;
+}
+
+.rewards-claimed-info h3 {
+  margin: 0;
+  font-family: "Playfair Display", serif;
+  font-size: 17px;
+}
+
+.rewards-claimed-info p {
+  margin: 5px 0;
+  color: #857867;
+  font-size: 12px;
+  line-height: 1.5;
+}
+
+.rewards-claimed-meta {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 7px;
+  color: #8b6427;
+  font-size: 10px;
+  font-weight: 700;
+}
+
+.rewards-claimed-code {
+  display: flex;
+  flex-direction: column;
+  align-items: flex-end;
+  gap: 4px;
+  flex-shrink: 0;
+}
+
+.rewards-claimed-code span {
+  color: #a17a35;
+  font-size: 9px;
+  font-weight: 800;
+  letter-spacing: 1px;
+}
+
+.rewards-claimed-code strong {
+  padding: 6px 9px;
+  border: 1px dashed #d6b77f;
+  border-radius: 7px;
+  background: #fff8e9;
+  color: #76502b;
+  font-size: 12px;
+}
+
+.rewards-claimed-code small {
+  color: #a09483;
+  font-size: 9px;
+}
+
+/* EMPTY STATE */
+
+.rewards-empty-state {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  padding: 35px 20px;
+  border: 1px dashed #d9c39c;
+  border-radius: 17px;
+  background: rgba(255, 250, 242, 0.45);
+  text-align: center;
+}
+
+.rewards-empty-state > span {
+  font-size: 35px;
+}
+
+.rewards-empty-state h3 {
+  margin: 12px 0 5px;
+  font-family: "Playfair Display", serif;
+  font-size: 18px;
+}
+
+.rewards-empty-state p {
+  margin: 0;
+  color: #857867;
+  font-size: 12px;
+}
+
+.rewards-claimed-empty {
+  padding: 28px 20px;
+}
+
+/* FOOTER */
+
+.rewards-page-footer {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  flex-wrap: wrap;
+  gap: 10px;
+  margin-top: 35px;
+  padding: 15px;
+  color: #8b7656;
+  font-size: 12px;
+  font-style: italic;
+  text-align: center;
+}
+
+.rewards-page-footer span {
+  color: #d99b35;
+}
+
+/* RESPONSIVE */
+
+@media (max-width: 1100px) {
+  .rewards-main {
+    padding: 25px 3%;
+  }
+
+  .rewards-grid {
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+  }
+
+  .rewards-balance-content {
+    padding: 28px;
+  }
+}
+
+@media (max-width: 850px) {
+  .rewards-sidebar {
+    width: 160px;
+  }
+
+  .rewards-treasure-illustration {
+    width: 135px;
+    height: 135px;
+  }
+
+  .rewards-treasure-circle {
+    width: 110px;
+    height: 110px;
+  }
+
+  .rewards-treasure-circle span {
+    font-size: 52px;
+  }
+
+  .rewards-claimed-card {
+    flex-wrap: wrap;
+  }
+}
+@media (max-width: 700px) {
+  .rewards-page {
+    display: block;
+    min-height: 100vh;
+  }
+
+  /* Hide only the old Rewards sidebar */
+  .rewards-sidebar {
+    display: none;
+  }
+
+  /* Main content - space for hamburger button */
+  .rewards-main {
+    width: 100%;
+    box-sizing: border-box;
+    padding: 80px 15px 20px;
+  }
+
+  .rewards-page-header {
+    align-items: flex-start;
+  }
+
+  .rewards-page-header h1 {
+    font-size: 27px;
+  }
+
+  .rewards-profile-button {
+    padding: 9px 12px;
+    font-size: 12px;
+  }
+
+  .rewards-balance-content {
+    flex-direction: column;
+    align-items: flex-start;
+    padding: 25px 22px;
+  }
+
+  .rewards-treasure-illustration {
+    align-self: center;
+  }
+
+  .rewards-grid {
+    grid-template-columns: 1fr;
+    gap: 12px;
+  }
+
+  .rewards-card {
+    padding: 18px;
+  }
+
+  .rewards-section-heading {
+    align-items: flex-start;
+  }
+
+  .rewards-section-heading h2 {
+    font-size: 22px;
+  }
+
+  .rewards-claimed-card {
+    align-items: flex-start;
+    padding: 14px;
+  }
+
+  .rewards-claimed-info {
+    width: calc(100% - 80px);
+  }
+
+  .rewards-claimed-code {
+    align-items: flex-start;
+    margin-left: 77px;
+  }
+
+  .rewards-claimed-meta {
+    font-size: 9px;
+  }
+}
+
+@media (max-width: 400px) {
+  .rewards-page-header {
+    flex-direction: column;
+  }
+
+  .rewards-card-footer {
+    flex-direction: column;
+    align-items: flex-start;
+  }
+
+  .rewards-redeem-button {
+    width: 100%;
+  }
+
+  .rewards-count {
+    font-size: 10px;
+  }
+}
+
+/* Arrange the reward category and demo badge. */
+.rewards-card-labels {
+  display: flex;
+  align-items: center;
+  flex-wrap: wrap;
+  gap: 8px;
+}
+
+/* Highlight demonstration rewards without changing the card design. */
+.rewards-demo-badge {
+  display: inline-flex;
+  align-items: center;
+  padding: 5px 10px;
+  border: 1px solid #d9b77b;
+  border-radius: 20px;
+  background: #fff3d6;
+  color: #94601c;
+  font-size: 10px;
+  font-weight: 800;
+}
+
+/* Keep the labels readable on smaller screens. */
+@media (max-width: 480px) {
+  .rewards-card-labels {
+    gap: 6px;
+  }
+}
+
+/* Full-screen overlay for the reward preview. */
+.reward-modal-overlay {
+  position: fixed;
+  inset: 0;
+  z-index: 2000;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: 20px;
+  background: rgba(24, 20, 15, 0.65);
+}
+
+/* Main reward preview dialog. */
+.reward-modal-content {
+  position: relative;
+  width: 100%;
+  max-width: 450px;
+  max-height: 90vh;
+  overflow-y: auto;
+  padding: 35px;
+  border: 1px solid #e0c99f;
+  border-radius: 22px;
+  background: #fff9ef;
+  box-shadow: 0 20px 60px rgba(0, 0, 0, 0.2);
+  text-align: center;
+}
+
+/* Close button positioned in the upper-right corner. */
+.reward-modal-close {
+  position: absolute;
+  top: 12px;
+  right: 17px;
+  border: none;
+  background: transparent;
+  color: #76502b;
+  font-size: 28px;
+  cursor: pointer;
+}
+
+/* Reward icon displayed inside the modal. */
+.reward-modal-icon {
+  margin-bottom: 15px;
+  font-size: 52px;
+}
+
+/* Reward title and description. */
+.reward-modal-content h2 {
+  margin: 16px 0 10px;
+  font-family: "Playfair Display", serif;
+  color: #29251f;
+}
+
+.reward-modal-content p {
+  color: #756858;
+  font-size: 14px;
+  line-height: 1.6;
+}
+
+/* Reward cost shown for demonstration purposes. */
+.reward-modal-points {
+  margin: 20px 0;
+  color: #8b6427;
+  font-size: 22px;
+  font-weight: 800;
+}
+
+/* Notice explaining that the voucher is not redeemable. */
+.reward-modal-notice {
+  padding: 13px;
+  border: 1px solid #e7d1a4;
+  border-radius: 12px;
+  background: #fff0d4;
+}
+
+/* Primary action for generating a demo voucher. */
+.reward-modal-generate {
+  width: 100%;
+  margin-top: 15px;
+  padding: 14px;
+  border: none;
+  border-radius: 12px;
+  background: #775020;
+  color: white;
+  font-family: inherit;
+  font-weight: 800;
+  cursor: pointer;
+}
+
+.reward-modal-generate:hover {
+  background: #966c2e;
+}
+
+/* Make the modal comfortable to use on mobile devices. */
+@media (max-width: 480px) {
+  .reward-modal-content {
+    padding: 28px 20px;
+  }
+}
+
+/* Display the proposed partner location in the reward modal. */
+.reward-modal-partner {
+  margin-top: 12px;
+  color: #76502b;
+  font-size: 13px;
+  font-weight: 800;
+}
+
+/* Center the QR code and its information. */
+.voucher-qr-container {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 12px;
+  padding: 20px;
+  border-radius: 15px;
+  background: #fffaf2;
+  text-align: center;
+}
+
+/* Display the voucher identifier below the QR code. */
+.voucher-qr-code {
+  margin: 0;
+  color: #76502b;
+  font-size: 13px;
+  font-weight: 800;
+  overflow-wrap: anywhere;
+}
+
+/* Explain the limitations of demonstration vouchers. */
+.voucher-qr-notice {
+  margin: 0;
+  color: #857867;
+  font-size: 11px;
+  line-height: 1.5;
+}

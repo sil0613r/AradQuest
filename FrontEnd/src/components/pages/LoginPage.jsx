@@ -1,10 +1,68 @@
+import { useState } from "react";
 import { useNavigate } from "react-router-dom";
 
 import aradQuestLogo from "../../assets/images/backgrounds/aradquest-logo.png";
+import { loginUser } from "../services/authService";
+import { useAuth } from "../context/AuthContext";
+
 import "../styles/LoginPage.css";
 
 function LoginPage() {
   const navigate = useNavigate();
+
+  // Access the shared authentication state.
+  const { updateUser } = useAuth();
+  // Store the user's login credentials.
+  const [email, setEmail] = useState("");
+  const [password, setPassword] = useState("");
+
+  // Manage authentication feedback and loading state.
+  const [loginError, setLoginError] = useState("");
+  const [isLoading, setIsLoading] = useState(false);
+
+  const handleLogin = async (event) => {
+    event.preventDefault();
+
+    // Clear previous authentication errors.
+    setLoginError("");
+
+    // Validate the required fields.
+    if (!email.trim() || !password) {
+      setLoginError("Please enter your email and password.");
+      return;
+    }
+
+    setIsLoading(true);
+
+    try {
+      // Send credentials to the Python backend.
+      const data = await loginUser(email.trim(), password);
+
+      // Redirect only after successful authentication.
+      // The backend response should contain the user's profile.
+      if (!data.user) {
+        throw new Error("Invalid authentication response.");
+      }
+      // Store the authenticated user in React context.
+      updateUser(data.user);
+
+      navigate("/home", { replace: true });
+    } catch (error) {
+      // Show a friendly message when the backend is unavailable.
+      if (error instanceof TypeError) {
+        setLoginError(
+          "Unable to connect to the server. Please try again later.",
+        );
+      } else {
+        // Display authentication errors returned by the API.
+        setLoginError(
+          error.message || "Something went wrong. Please try again.",
+        );
+      }
+    } finally {
+      setIsLoading(false);
+    }
+  };
 
   return (
     <main className="login-page">
@@ -21,14 +79,7 @@ function LoginPage() {
         </header>
 
         {/* Formularul de autentificare */}
-        <form
-          className="login-form"
-          onSubmit={(event) => {
-            // Prevenim reîncărcarea paginii până conectăm backendul.
-            event.preventDefault();
-            console.log("Login form submitted");
-          }}
-        >
+        <form className="login-form" onSubmit={handleLogin}>
           {/* Câmpul pentru email */}
           <div className="login-field">
             <label className="login-label" htmlFor="email">
@@ -41,6 +92,9 @@ function LoginPage() {
               name="email"
               type="email"
               autoComplete="email"
+              value={email}
+              onChange={(event) => setEmail(event.target.value)}
+              disabled={isLoading}
               required
             />
           </div>
@@ -69,6 +123,9 @@ function LoginPage() {
               name="password"
               type="password"
               autoComplete="current-password"
+              value={password}
+              onChange={(event) => setPassword(event.target.value)}
+              disabled={isLoading}
               required
             />
           </div>
@@ -79,9 +136,19 @@ function LoginPage() {
             <span>Keep me logged in on this device</span>
           </label>
 
+          {/* Display authentication errors. */}
+          {loginError && (
+            <div className="login-error" role="alert">
+              <span aria-hidden="true">⚠️</span>
+              <span>{loginError}</span>
+            </div>
+          )}
+
           {/* Butonul de autentificare */}
-          <button className="login-submit" type="submit">
-            Log in
+
+          {/* Submit the login form. */}
+          <button className="login-submit" type="submit" disabled={isLoading}>
+            {isLoading ? "Logging in..." : "Log in"}
           </button>
         </form>
 

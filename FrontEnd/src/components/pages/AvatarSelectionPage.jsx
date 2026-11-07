@@ -48,7 +48,22 @@ function AvatarSelectionPage() {
       return;
     }
 
+    // Save the selected avatar separately
     localStorage.setItem("selectedAvatar", selectedAvatar);
+
+    // Get the registered user's information
+    const currentUser = JSON.parse(localStorage.getItem("currentUser") || "{}");
+
+    // Update the user with the selected avatar
+    const updatedUser = {
+      ...currentUser,
+      avatar: selectedAvatar,
+    };
+
+    // Save the updated user
+    localStorage.setItem("currentUser", JSON.stringify(updatedUser));
+
+    // Continue to HomePage
     navigate("/home");
   };
 

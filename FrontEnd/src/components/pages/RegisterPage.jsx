@@ -3,12 +3,16 @@ import { Link, useNavigate } from "react-router-dom";
 
 import aradQuestLogo from "../../assets/images/backgrounds/aradquest-logo.png";
 import "../styles/RegisterPage.css";
+import { registerUser, loginUser } from "../services/authService";
+import { useAuth } from "../context/AuthContext";
 
 function RegisterPage() {
   const navigate = useNavigate();
 
-  // We store the values entered by the user in the form.
-  //This is an obj
+  // Access the shared authentication state.
+  const { updateUser } = useAuth();
+
+  // Store the values entered by the user
   const [formData, setFormData] = useState({
     username: "",
     email: "",
@@ -16,19 +20,20 @@ function RegisterPage() {
     confirmPassword: "",
   });
 
-  // We control if the password will be hidden or not
+  // Control password visibility
   const [showPassword, setShowPassword] = useState(false);
-
-  // We control the display of the password confirmation separately
   const [showConfirmPassword, setShowConfirmPassword] = useState(false);
 
-  // We will keep the error messages
+  // Store validation errors
   const [errors, setErrors] = useState({});
+
+  // Track the registration request state.
+  const [isLoading, setIsLoading] = useState(false);
 
   // Check if the user accepted the terms
   const [acceptedTerms, setAcceptedTerms] = useState(false);
 
-  // Calculate the password s strength
+  // Calculate password strength
   const getPasswordStrength = (password) => {
     if (!password) {
       return { label: "", score: 0 };
@@ -36,20 +41,10 @@ function RegisterPage() {
 
     let score = 0;
 
-    // Check for:
-    //passwords length
     if (password.length >= 8) score++;
-
-    // lowercase
     if (/[a-z]/.test(password)) score++;
-
-    // Uppercase
     if (/[A-Z]/.test(password)) score++;
-
-    // Digit
     if (/[0-9]/.test(password)) score++;
-
-    // Symbol
     if (/[^A-Za-z0-9]/.test(password)) score++;
 
     let label = "Weak";
@@ -63,12 +58,10 @@ function RegisterPage() {
     return { label, score };
   };
 
-  // Calculate the strength indicator for the entered password.
   const passwordStrength = getPasswordStrength(formData.password);
 
-  // Function for updating a field's value whenever the user types.
+  // Update a field whenever the user types
   const handleChange = (event) => {
-    //destructuring
     const { name, value } = event.target;
 
     setFormData((previousData) => ({
@@ -76,7 +69,7 @@ function RegisterPage() {
       [name]: value,
     }));
 
-    // Clear the field's error message as the field is modified. Form Errors
+    // Clear the corresponding error
     setErrors((previousErrors) => ({
       ...previousErrors,
       [name]: "",
@@ -84,40 +77,39 @@ function RegisterPage() {
     }));
   };
 
-  // Check if the form is completed correctly
-  //Validation Function
+  // Validate the registration form
   const validateForm = () => {
     const newErrors = {};
 
-    // Check the username
+    // Username validation
     if (!formData.username.trim()) {
       newErrors.username = "Please enter a username.";
     } else if (formData.username.trim().length < 3) {
       newErrors.username = "Username must contain at least 3 characters.";
     }
 
-    // Check the email
+    // Email validation
     if (!formData.email.trim()) {
       newErrors.email = "Please enter your email address.";
     } else if (!/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(formData.email.trim())) {
       newErrors.email = "Please enter a valid email address.";
     }
 
-    // Check the password
+    // Password validation
     if (!formData.password) {
       newErrors.password = "Please enter a password.";
     } else if (formData.password.length < 8) {
       newErrors.password = "Password must contain at least 8 characters.";
     }
 
-    // Check if the passwords are the same
+    // Confirm password validation
     if (!formData.confirmPassword) {
       newErrors.confirmPassword = "Please confirm your password.";
     } else if (formData.password !== formData.confirmPassword) {
       newErrors.confirmPassword = "Passwords do not match.";
     }
 
-    // Check if the user accepted the terms
+    // Terms validation
     if (!acceptedTerms) {
       newErrors.terms = "You must accept the Terms and Privacy Policy.";
     }
@@ -125,24 +117,68 @@ function RegisterPage() {
     return newErrors;
   };
 
-  // Process the submitting of the form
-  const handleSubmit = (event) => {
-    // Won't allow to reload the current page
+  // Validate the form and register the user.
+  const handleSubmit = async (event) => {
     event.preventDefault();
 
-    // Check all the fields before submitting
-    const validationErrors = validateForm();
+    // Prevent duplicate registration requests.
+    if (isLoading) return;
 
+    // Validate all registration fields.
+    const validationErrors = validateForm();
     setErrors(validationErrors);
 
-    // If there are errors, we won't continue
+    // Stop if any validation errors exist.
     if (Object.keys(validationErrors).length > 0) {
       return;
     }
 
-    console.log("Registration form is valid.");
+    setIsLoading(true);
 
-    navigate("/choose-avatar");
+    try {
+      // Register the user using mock authentication or FastAPI.
+      const data = await registerUser(
+        formData.username,
+        formData.email,
+        formData.password,
+      );
+
+      // Verify that the account was successfully created.
+      if (data?.status !== "succes" || !data?.user_id) {
+        throw new Error(data?.mesaj || "Invalid registration response.");
+      }
+
+      // Automatically log in after successful registration.
+      const loginData = await loginUser(formData.email, formData.password);
+
+      // Verify that authentication succeeded.
+      if (!loginData?.user) {
+        throw new Error("Unable to authenticate after registration.");
+      }
+
+      // Save the authenticated user in AuthContext.
+      updateUser(loginData.user);
+
+      // Redirect the user directly to HomePage.
+      navigate("/home", { replace: true });
+    } catch (error) {
+      // Log the error for debugging.
+      console.error("Registration error:", error);
+
+      // Display a friendly error message.
+      const message =
+        error instanceof TypeError
+          ? "Unable to complete registration. Please check the console."
+          : error.message || "Registration failed. Please try again.";
+
+      setErrors((previousErrors) => ({
+        ...previousErrors,
+        form: message,
+      }));
+    } finally {
+      // Restore the registration button.
+      setIsLoading(false);
+    }
   };
 
   return (
@@ -158,7 +194,7 @@ function RegisterPage() {
           </p>
         </header>
 
-        {/* register form. */}
+        {/* Registration form */}
         <form className="register-form" onSubmit={handleSubmit} noValidate>
           {/* Username */}
           <div className="register-field">
@@ -232,7 +268,7 @@ function RegisterPage() {
               </button>
             </div>
 
-            {/* Password's strength indicator*/}
+            {/* Password strength indicator */}
             {formData.password && (
               <div className="password-strength">
                 <div
@@ -298,7 +334,7 @@ function RegisterPage() {
             )}
           </div>
 
-          {/* Terms and confidence */}
+          {/* Terms and Privacy Policy */}
           <div className="register-terms-container">
             <label className="register-terms">
               <input
@@ -324,15 +360,20 @@ function RegisterPage() {
             {errors.terms && <p className="register-error">{errors.terms}</p>}
           </div>
 
-          {/* General error message if necessary */}
+          {/* General error message */}
           {errors.form && (
             <p className="register-error" role="alert">
               {errors.form}
             </p>
           )}
 
-          <button className="register-submit" type="submit">
-            Join now
+          {/* Submit the registration form. */}
+          <button
+            className="register-submit"
+            type="submit"
+            disabled={isLoading}
+          >
+            {isLoading ? "Creating account..." : "Join now"}
           </button>
         </form>
 

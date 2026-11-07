@@ -1,0 +1,369 @@
+/* SIDEBAR — CREAM & GOLD DESIGN */
+
+/* MOBILE HAMBURGER BUTTON */
+
+.app-hamburger-button {
+  display: none;
+}
+
+@media (max-width: 700px) {
+  .app-hamburger-button {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+
+    position: fixed;
+    top: 18px;
+    right: 18px;
+
+    width: 48px;
+    height: 48px;
+
+    background: #fffdf8;
+    color: #766858;
+
+    border: 1px solid #eadfce;
+    border-radius: 12px;
+
+    font-size: 27px;
+    cursor: pointer;
+
+    z-index: 1200;
+
+    box-shadow: 0 3px 10px rgba(80, 55, 25, 0.12);
+  }
+
+  .app-hamburger-button:hover {
+    background: #f4e8d2;
+  }
+}
+.app-sidebar {
+  width: 245px;
+  min-height: 100vh;
+  height: auto;
+  align-self: stretch;
+  flex-shrink: 0;
+
+  background: #fffdf8;
+  color: #766858;
+
+  border-right: 1px solid #eadfce;
+
+  display: flex;
+  flex-direction: column;
+
+  padding: 20px 20px;
+}
+
+/* LOGO */
+
+.app-sidebar-logo {
+  height: 235px;
+
+  display: flex;
+  justify-content: center;
+  align-items: flex-start;
+
+  margin-bottom: 20px;
+}
+
+.app-sidebar-logo img {
+  width: 165px;
+  height: 165px;
+
+  object-fit: contain;
+}
+
+/* NAVIGATION */
+
+.app-sidebar-navigation {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+}
+
+.app-nav-item {
+  width: 100%;
+  min-height: 64px;
+
+  border: none;
+  background: transparent;
+  color: #766858;
+
+  display: flex;
+  align-items: center;
+  gap: 14px;
+
+  padding: 12px 18px;
+  border-radius: 15px;
+
+  font-family: "Nunito", sans-serif;
+  font-size: 16px;
+  font-weight: 500;
+
+  text-align: left;
+  cursor: pointer;
+
+  transition:
+    background 0.2s ease,
+    color 0.2s ease,
+    transform 0.2s ease;
+}
+
+/* HOVER & ACTIVE */
+
+.app-nav-item:hover {
+  background: #f4e8d2;
+  color: #5c4020;
+}
+
+.app-nav-item.active {
+  background: #e8d4ad;
+  color: #5c4020;
+  font-weight: 800;
+}
+
+.app-nav-item:hover {
+  transform: translateX(2px);
+}
+
+/* ICONS — EMOJI-URILE RAMAN COLORATE */
+
+.app-nav-icon {
+  font-size: 23px;
+  width: 26px;
+
+  display: flex;
+  align-items: center;
+  justify-content: center;
+
+  flex-shrink: 0;
+}
+
+.app-nav-label {
+  white-space: nowrap;
+}
+
+/* SIDEBAR FOOTER */
+
+.app-sidebar-bottom {
+  margin-top: auto;
+  min-height: 110px;
+
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: flex-end;
+
+  padding-bottom: 25px;
+  gap: 8px;
+
+  color: #b58a49;
+
+  font-size: 12px;
+  font-weight: 800;
+  white-space: nowrap;
+}
+
+.app-sidebar-bottom small {
+  color: #a89a86;
+  font-size: 10px;
+  font-weight: 500;
+}
+
+/* MOBILE OVERLAY */
+
+.app-mobile-overlay {
+  display: none;
+}
+
+/* RESPONSIVE */
+
+@media (max-width: 1050px) {
+  .app-sidebar {
+    width: 205px;
+    padding: 20px 14px;
+  }
+
+  .app-sidebar-logo {
+    height: 190px;
+  }
+
+  .app-sidebar-logo img {
+    width: 145px;
+    height: 145px;
+  }
+
+  .app-nav-item {
+    font-size: 14px;
+    min-height: 58px;
+    padding: 11px 13px;
+  }
+}
+
+/* MOBILE MENU */
+
+@media (max-width: 700px) {
+  .app-sidebar {
+    display: none;
+  }
+
+  .app-mobile-overlay {
+    display: block;
+
+    position: fixed;
+    inset: 0;
+
+    background: rgba(35, 27, 18, 0.42);
+    backdrop-filter: blur(2px);
+
+    z-index: 1100;
+  }
+
+  .app-mobile-menu {
+    position: absolute;
+    right: 0;
+    top: 0;
+
+    width: min(310px, 85%);
+    height: 100%;
+
+    background: #fffdf8;
+    color: #766858;
+
+    border-left: 1px solid #eadfce;
+
+    padding: 22px 18px;
+
+    animation: appSlideMenu 0.25s ease;
+    overflow-y: auto;
+
+    display: flex;
+    flex-direction: column;
+  }
+
+  @keyframes appSlideMenu {
+    from {
+      transform: translateX(100%);
+    }
+
+    to {
+      transform: translateX(0);
+    }
+  }
+
+  /* MOBILE HEADER */
+
+  .app-mobile-header {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+
+    margin-bottom: 10px;
+  }
+
+  .app-mobile-header h2 {
+    color: #b58a49;
+    font-size: 20px;
+    font-weight: 800;
+  }
+
+  .app-mobile-header button {
+    color: #766858;
+    background: none;
+    border: none;
+
+    font-size: 23px;
+    cursor: pointer;
+  }
+
+  /* MOBILE LOGO */
+
+  .app-mobile-logo {
+    display: flex;
+    justify-content: center;
+
+    margin-bottom: 20px;
+  }
+
+  .app-mobile-logo img {
+    width: 130px;
+    height: 120px;
+
+    object-fit: contain;
+  }
+
+  /* MOBILE NAVIGATION */
+
+  .app-mobile-navigation {
+    display: flex;
+    flex-direction: column;
+    gap: 8px;
+  }
+
+  .app-mobile-navigation .app-nav-item {
+    min-height: 58px;
+  }
+
+  /* MOBILE FOOTER */
+
+  .app-mobile-footer {
+    margin-top: auto;
+    padding-top: 35px;
+    padding-bottom: 20px;
+
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 8px;
+
+    text-align: center;
+
+    color: #b58a49;
+    font-size: 12px;
+    font-weight: 800;
+  }
+
+  .app-mobile-footer small {
+    color: #a89a86;
+    font-size: 10px;
+    font-weight: 500;
+  }
+}
+
+/* Logout section */
+
+.app-sidebar-logout {
+  padding: 12px 16px;
+}
+
+.app-logout-button {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  width: 100%;
+  padding: 12px 16px;
+  border: 1px solid rgba(180, 55, 55, 0.2);
+  border-radius: 12px;
+  background: rgba(180, 55, 55, 0.07);
+  color: #a33a3a;
+  font: inherit;
+  font-weight: 600;
+  cursor: pointer;
+  transition: background 0.2s ease;
+}
+
+.app-logout-button:hover {
+  background: rgba(180, 55, 55, 0.14);
+}
+
+.app-logout-button:disabled {
+  opacity: 0.6;
+  cursor: not-allowed;
+}
+
+.app-logout-error {
+  margin-top: 8px;
+  color: #a33a3a;
+  font-size: 13px;
+}
