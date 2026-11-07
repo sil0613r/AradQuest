@@ -3,6 +3,10 @@
 -- ARAD QUEST
 -- 02 - Initial data
 -- PostgreSQL + PostGIS
+--
+-- Safe to run more than once: each row is inserted only if it is not already there
+-- (ON CONFLICT or WHERE NOT EXISTS). Rows you added or changed yourself are left alone.
+-- Run 01_create_tables.sql first.
 -- ==========================================
 
 BEGIN;
@@ -16,7 +20,8 @@ VALUES
 ('Explorer', 'Descopera obiective turistice'),
 ('Adventurer', 'Exploreaza orasul si rezolva misiuni'),
 ('Champion', 'Participa la provocari si acumuleaza puncte'),
-('Pathfinder', 'Descopera trasee noi');
+('Pathfinder', 'Descopera trasee noi')
+ON CONFLICT (class_name) DO NOTHING;
 
 -- ==========================================
 -- 2. OBIECTIVE TURISTICE
@@ -24,6 +29,8 @@ VALUES
 
 INSERT INTO obiective_turistice
 (name, description, address, image_url, location, radius_meters)
+SELECT v.name, v.description, v.address, v.image_url, v.location, v.radius_meters
+FROM (
 VALUES
 
 -- TRaseul cultural
@@ -118,6 +125,10 @@ VALUES
     NULL,
     ST_SetSRID(ST_MakePoint(21.325142, 46.166411), 4326)::geography,
     50
+)
+) AS v(name, description, address, image_url, location, radius_meters)
+WHERE NOT EXISTS (
+    SELECT 1 FROM obiective_turistice o WHERE o.name = v.name
 );
 
 -- ==========================================
@@ -126,6 +137,8 @@ VALUES
 
 INSERT INTO trasee_tematice
 (title, description, difficulty, estimated_minutes)
+SELECT v.title, v.description, v.difficulty, v.estimated_minutes
+FROM (
 VALUES
 (
     'Descopera Aradul',
@@ -138,6 +151,10 @@ VALUES
     'Un traseu prin parcurile si zonele verzi ale orasului Arad, dedicat descoperirii naturii si activitatilor in aer liber.',
     'easy',
     60
+)
+) AS v(title, description, difficulty, estimated_minutes)
+WHERE NOT EXISTS (
+    SELECT 1 FROM trasee_tematice t WHERE t.title = v.title
 );
 
 -- ==========================================
@@ -164,7 +181,8 @@ FROM (
 JOIN trasee_tematice t
     ON t.title = 'Descopera Aradul'
 JOIN obiective_turistice o
-    ON o.name = v.objective_name;
+    ON o.name = v.objective_name
+ON CONFLICT (route_id, objective_id) DO NOTHING;
 
 -- Traseul in natura
 
@@ -185,7 +203,8 @@ FROM (
 JOIN trasee_tematice t
     ON t.title = 'Traseul in natura'
 JOIN obiective_turistice o
-    ON o.name = v.objective_name;
+    ON o.name = v.objective_name
+ON CONFLICT (route_id, objective_id) DO NOTHING;
 
 -- ==========================================
 -- 5. MISIUNI
@@ -275,7 +294,11 @@ FROM (
 
 ) AS v(objective_name, mission_title, mission_description, points_reward)
 JOIN obiective_turistice o
-    ON o.name = v.objective_name;
+    ON o.name = v.objective_name
+WHERE NOT EXISTS (
+    SELECT 1 FROM misiuni x
+    WHERE x.objective_id = o.objective_id AND x.title = v.mission_title
+);
 
 -- ==========================================
 -- 6. INDICII
@@ -299,7 +322,8 @@ FROM (
          'Gandeste-te la personalitatile legate de teatrul din Arad.', 1)
 ) AS v(mission_title, clue_text, clue_order)
 JOIN misiuni m
-    ON m.title = v.mission_title;
+    ON m.title = v.mission_title
+ON CONFLICT (mission_id, clue_order) DO NOTHING;
 
 -- ==========================================
 -- 7. RASPUNSURI CORECTE ACCEPTATE
@@ -325,7 +349,11 @@ FROM (
         ('Jocul de pe faleza', '4')
 ) AS v(mission_title, accepted_answer)
 JOIN misiuni m
-    ON m.title = v.mission_title;
+    ON m.title = v.mission_title
+WHERE NOT EXISTS (
+    SELECT 1 FROM raspunsuri_corecte x
+    WHERE x.mission_id = m.mission_id AND x.accepted_answer = v.accepted_answer
+);
 
 -- ==========================================
 -- 8. INSIGNE DISPONIBILE
@@ -336,7 +364,8 @@ INSERT INTO insigne_disponibile
 VALUES
 ('Primul pas', 'Pentru prima misiune completata.', 20),
 ('Explorator', 'Pentru acumularea a 50 de puncte.', 50),
-('Detectiv', 'Pentru rezolvarea mai multor indicii.', 100);
+('Detectiv', 'Pentru rezolvarea mai multor indicii.', 100)
+ON CONFLICT (name) DO NOTHING;
 
 -- ==========================================
 -- 9. RECOMPENSE DISPONIBILE
@@ -344,9 +373,15 @@ VALUES
 
 INSERT INTO recompense_disponibile
 (name, description, points_cost, quantity_available)
+SELECT v.name, v.description, v.points_cost, v.quantity_available
+FROM (
 VALUES
 ('Reducere simbolica', 'O reducere oferita ca recompensa.', 50, 10),
-('Premiu special', 'Un premiu pentru jucatorii activi.', 100, 5);
+('Premiu special', 'Un premiu pentru jucatorii activi.', 100, 5)
+) AS v(name, description, points_cost, quantity_available)
+WHERE NOT EXISTS (
+    SELECT 1 FROM recompense_disponibile x WHERE x.name = v.name
+);
 
 -- ==========================================
 -- SFARSITUL INSERARII DATELOR

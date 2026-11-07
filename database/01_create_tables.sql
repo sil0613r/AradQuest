@@ -3,17 +3,24 @@
 -- ARAD QUEST
 -- Crearea tabelelor pentru baza de date
 -- PostgreSQL + PostGIS
+--
+-- Safe to run more than once: every statement uses IF NOT EXISTS, so a
+-- re-run on an existing database only creates what is missing.
 -- ==========================================
 
+-- PostGIS provides the GEOGRAPHY type and ST_* functions used below.
+-- Railway's PostGIS template and the docker-compose image already have it; a plain Postgres does not.
+CREATE EXTENSION IF NOT EXISTS postgis;
+
 -- 1. Clasele de jucatori
-CREATE TABLE clase_jucatori (
+CREATE TABLE IF NOT EXISTS clase_jucatori (
     class_id SERIAL PRIMARY KEY,
     class_name VARCHAR(50) NOT NULL UNIQUE,
     description TEXT
 );
 
 -- 2. Jucatori
-CREATE TABLE jucatori (
+CREATE TABLE IF NOT EXISTS jucatori (
     player_id SERIAL PRIMARY KEY,
     username VARCHAR(50) NOT NULL UNIQUE,
     email VARCHAR(100) NOT NULL UNIQUE,
@@ -24,7 +31,7 @@ CREATE TABLE jucatori (
 );
 
 -- 3. Obiective turistice
-CREATE TABLE obiective_turistice (
+CREATE TABLE IF NOT EXISTS obiective_turistice (
     objective_id SERIAL PRIMARY KEY,
     name VARCHAR(150) NOT NULL,
     description TEXT,
@@ -36,11 +43,11 @@ CREATE TABLE obiective_turistice (
 );
 
 -- Index pentru cautarea obiectivelor dupa locatie
-CREATE INDEX idx_obiective_turistice_location
+CREATE INDEX IF NOT EXISTS idx_obiective_turistice_location
 ON obiective_turistice USING GIST (location);
 
 -- 4. Trasee tematice
-CREATE TABLE trasee_tematice (
+CREATE TABLE IF NOT EXISTS trasee_tematice (
     route_id SERIAL PRIMARY KEY,
     title VARCHAR(150) NOT NULL,
     description TEXT,
@@ -51,7 +58,7 @@ CREATE TABLE trasee_tematice (
 );
 
 -- 5. Obiectivele incluse in trasee
-CREATE TABLE ordine_obiective_traseu (
+CREATE TABLE IF NOT EXISTS ordine_obiective_traseu (
     route_id INTEGER REFERENCES trasee_tematice(route_id)
         ON DELETE CASCADE,
     objective_id INTEGER REFERENCES obiective_turistice(objective_id),
@@ -61,7 +68,7 @@ CREATE TABLE ordine_obiective_traseu (
 );
 
 -- 6. Misiuni
-CREATE TABLE misiuni (
+CREATE TABLE IF NOT EXISTS misiuni (
     mission_id SERIAL PRIMARY KEY,
     objective_id INTEGER NOT NULL
         REFERENCES obiective_turistice(objective_id),
@@ -73,7 +80,7 @@ CREATE TABLE misiuni (
 );
 
 -- 7. Indicii
-CREATE TABLE indicii (
+CREATE TABLE IF NOT EXISTS indicii (
     clue_id SERIAL PRIMARY KEY,
     mission_id INTEGER NOT NULL
         REFERENCES misiuni(mission_id) ON DELETE CASCADE,
@@ -83,7 +90,7 @@ CREATE TABLE indicii (
 );
 
 -- 8. Raspunsuri corecte acceptate
-CREATE TABLE raspunsuri_corecte (
+CREATE TABLE IF NOT EXISTS raspunsuri_corecte (
     solution_id SERIAL PRIMARY KEY,
     mission_id INTEGER NOT NULL
         REFERENCES misiuni(mission_id) ON DELETE CASCADE,
@@ -91,7 +98,7 @@ CREATE TABLE raspunsuri_corecte (
 );
 
 -- 9. Progresul jucatorilor pe trasee
-CREATE TABLE progres_jucatori_trasee (
+CREATE TABLE IF NOT EXISTS progres_jucatori_trasee (
     player_id INTEGER REFERENCES jucatori(player_id)
         ON DELETE CASCADE,
     route_id INTEGER REFERENCES trasee_tematice(route_id)
@@ -104,7 +111,7 @@ CREATE TABLE progres_jucatori_trasee (
 );
 
 -- 10. Progresul jucatorilor pe misiuni
-CREATE TABLE progres_jucatori_misiuni (
+CREATE TABLE IF NOT EXISTS progres_jucatori_misiuni (
     player_id INTEGER REFERENCES jucatori(player_id)
         ON DELETE CASCADE,
     mission_id INTEGER REFERENCES misiuni(mission_id)
@@ -120,7 +127,7 @@ CREATE TABLE progres_jucatori_misiuni (
 );
 
 -- 11. Raspunsuri trimise de jucatori
-CREATE TABLE raspunsuri_trimise (
+CREATE TABLE IF NOT EXISTS raspunsuri_trimise (
     attempt_id SERIAL PRIMARY KEY,
     player_id INTEGER NOT NULL,
     mission_id INTEGER NOT NULL,
@@ -133,7 +140,7 @@ CREATE TABLE raspunsuri_trimise (
 );
 
 -- 12. Insigne disponibile
-CREATE TABLE insigne_disponibile (
+CREATE TABLE IF NOT EXISTS insigne_disponibile (
     badge_id SERIAL PRIMARY KEY,
     name VARCHAR(100) NOT NULL UNIQUE,
     description TEXT,
@@ -141,7 +148,7 @@ CREATE TABLE insigne_disponibile (
 );
 
 -- 13. Insigne obtinute de jucatori
-CREATE TABLE insigne_jucatori (
+CREATE TABLE IF NOT EXISTS insigne_jucatori (
     player_id INTEGER REFERENCES jucatori(player_id)
         ON DELETE CASCADE,
     badge_id INTEGER REFERENCES insigne_disponibile(badge_id),
@@ -150,7 +157,7 @@ CREATE TABLE insigne_jucatori (
 );
 
 -- 14. Recompense disponibile
-CREATE TABLE recompense_disponibile (
+CREATE TABLE IF NOT EXISTS recompense_disponibile (
     reward_id SERIAL PRIMARY KEY,
     name VARCHAR(150) NOT NULL,
     description TEXT,
@@ -162,7 +169,7 @@ CREATE TABLE recompense_disponibile (
 );
 
 -- 15. Recompense revendicate de jucatori
-CREATE TABLE recompense_revendicate (
+CREATE TABLE IF NOT EXISTS recompense_revendicate (
     claim_id SERIAL PRIMARY KEY,
     player_id INTEGER NOT NULL REFERENCES jucatori(player_id),
     reward_id INTEGER NOT NULL REFERENCES recompense_disponibile(reward_id),

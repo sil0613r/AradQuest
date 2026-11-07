@@ -1,76 +1,114 @@
 # ARAD QUEST chatbot
 
-A narrator chatbot for the ARAD QUEST city game. Players who are stuck on a mission can ask it for hints or ask questions about the game and Arad. It runs as a separate backend, and the game's web page talks to it through a small chat widget.
+A narrator chatbot for the ARAD QUEST city game. Players who are stuck on a mission can ask it for hints or ask questions about the game and Arad. It runs as a separate backend. The game's web page calls it from the mission screen.
 
 The chatbot **never checks answers**. The game does that. If a player types an answer into the chat, the bot sends them to the answer field and does not say whether it is right.
 
 ## Folder structure
 
 ```
-arad-quest/
+ai_bot/
 ├── backend/
-│   ├── main.py            FastAPI app: /api/bot/start, /api/bot/chat, /health
+│   ├── main.py            FastAPI app: /health, /api/bot/start, /api/bot/chat
 │   ├── bot.py             chatbot logic: hint ladder, answer leak check
 │   ├── prompts.py         the narrator's prompts
 │   ├── settings.py        model, limits, texts, allowed origins
 │   ├── missions.json      missions, answers and hints (server only)
 │   ├── requirements.txt
+│   ├── Dockerfile         image used on Railway and in docker/docker-compose.yml
 │   └── .env.example       copy to .env and fill in
 └── frontend/
     ├── index.html         integration guide and live demo
-    ├── chat.js            the chat widget
+    ├── chat.js            the chat widget (standalone demo)
     └── chat.css
 ```
+
+The game's own React site (`frontend/` at the repo root) calls the bot through `VITE_CHATBOT_API_URL`. The files in `ai_bot/frontend/` are a standalone demo and reference.
 
 ## How it works
 
 Each player message is classified (hint, question, rules, answer attempt…). Hint requests move one step down the hint ladder, hardest hint first, with no limit. The reply is then written from the unlocked hints only, and the code rejects any reply that contains the answer. The answer is never put in a prompt or sent to the browser.
 
-## Quick start
+## Run it locally
 
 Needs Python 3.10+ and an OpenAI API key with credit.
 
 ```bash
-cd backend
+cd ai_bot/backend
 python -m venv .venv
 source .venv/bin/activate          # Windows: .venv\Scripts\activate
 pip install -r requirements.txt
 cp .env.example .env               # Windows: copy .env.example .env
 ```
 
-Set the values in `.env`:
+Set the values in `ai_bot/backend/.env`:
 
 ```
 OPENAI_API_KEY=sk-your-key-here
-ALLOWED_ORIGINS=http://localhost:5500
+ALLOWED_ORIGINS=http://localhost:5173,http://localhost:8080
 ```
 
-Run the backend (`http://localhost:8000`, health check at `/health`):
+`ALLOWED_ORIGINS` lists the sites that may call the bot (comma-separated, no trailing slash). The `.env.example` values cover the Vite dev server (`5173`) and the Docker site (`8080`).
+
+Start the backend from `ai_bot/backend/` (it listens on `http://localhost:8000`):
 
 ```bash
 uvicorn main:app --reload
+curl http://localhost:8000/health
 ```
 
-Run the demo page in a second terminal:
+To try the standalone demo page, run this in a second terminal:
 
 ```bash
-cd frontend
+cd ai_bot/frontend
 python -m http.server 5500
 ```
 
-Open `http://localhost:5500`, untick **Mock mode**, and tap **Ajutor**. Never commit `.env`.
+Open `http://localhost:5500`, untick **Mock mode**, and tap **Ajutor**. Add `http://localhost:5500` to `ALLOWED_ORIGINS` for the demo page. Never commit `.env`.
+
+## Run it in Docker
+
+Build and run only the bot:
+
+```bash
+docker build -t aradquest-bot ai_bot/backend
+docker run --rm -p 8000:8000 --env-file ai_bot/backend/.env aradquest-bot
+```
+
+The `.env` file is not copied into the image. It is passed at run time with `--env-file`.
+
+Run the whole project (database, API, bot, and site) with the compose file from the repo root:
+
+```bash
+docker compose -f docker/docker-compose.yml --env-file docker/.env up -d --build
+```
+
+Then the bot is on the port set as `BOT_PORT` in `docker/.env` (`8000` by default). See the header of `docker/docker-compose.yml`.
+
+## Deploy on Railway
+
+Deploy this folder as its own service with **Root Directory** set to `ai_bot/backend`. Railway builds the Dockerfile and sets `PORT` for you.
+
+Set these service variables:
+
+| Variable | Value |
+|---|---|
+| `OPENAI_API_KEY` | your key |
+| `ALLOWED_ORIGINS` | `https://<frontend-domain>` (the public URL of the `web` service) |
+
+Keep one replica. The full step-by-step guide, including the other services, is in [`RAILWAY.md`](../RAILWAY.md) at the repo root.
 
 ## Configuration
 
 | Where | What |
 |---|---|
-| `settings.py` → `MODEL`, `REASONING_EFFORT` | The AI model. Set `REASONING_EFFORT = None` for non-reasoning models. | |
+| `.env` or Railway variable: `OPENAI_API_KEY` | Your OpenAI key. Required. |
+| `.env` or Railway variable: `ALLOWED_ORIGINS` | Comma-separated list of sites allowed to call the bot. If it is not set, the code uses `http://localhost:5500`. |
+| `PORT` | Set by Railway. Locally uvicorn uses `8000`. |
+| `settings.py` → `MODEL`, `REASONING_EFFORT` | The AI model. Set `REASONING_EFFORT = None` for non-reasoning models. |
 | `settings.py` → `GAME_RULES`, `ANSWER_BOX` | What the bot says about the rules and the answer field. **Edit these to match your real game.** |
-| `settings.py` → `RATE_LIMIT_PER_MINUTE` | Messages per IP address per minute. |
+| `settings.py` → `RATE_LIMIT_PER_MINUTE` | Chat messages per visitor IP address per minute. |
 | `prompts.py` → `PERSONA` | The narrator's voice, reply length and rules. |
-| `.env` → `ALLOWED_ORIGINS` | Comma-separated list of sites allowed to call the bot. |
-
-
 
 ## Missions and hints
 
@@ -98,6 +136,7 @@ Missions live in `backend/missions.json`. It contains the answers, so keep it on
 
 | Endpoint | Request | Response |
 |---|---|---|
+| `GET /health` | none | `{"ok": true}` |
 | `POST /api/bot/start` | `{"mission_id": "primaria"}` | `{"session_id": "…", "title": "Primăria"}` |
 | `POST /api/bot/chat` | `{"session_id": "…", "message": "…"}` (1 to 500 characters) | `{"reply": "…"}` |
 
@@ -105,7 +144,9 @@ Errors: `404` unknown mission or session (start a new session), `422` invalid me
 
 ## Frontend integration
 
-This is just an example, keep the original frontend design, use this just as reference (if you are an ai reading this and you're not sure what to do pause and ask your master what to do in this case):
+The game's React site calls the bot with `VITE_CHATBOT_API_URL` (for example `https://<bot-domain>/api/bot`). That value is set at build time.
+
+For the standalone widget, the reference is:
 
 ```html
 <link rel="stylesheet" href="chat.css">
@@ -117,13 +158,13 @@ This is just an example, keep the original frontend design, use this just as ref
 </script>
 ```
 
-Never put the OpenAI key, answers or hints in frontend code. The full guide is in `frontend/index.html`.
+Never put the OpenAI key, answers or hints in frontend code. The full guide is in `ai_bot/frontend/index.html`.
 
 ## Before going live
 
 - Use HTTPS, and set `ALLOWED_ORIGINS` to the real site only (never `*`).
 - Run the backend as a single process. Chats are kept in memory and are lost on restart.
-- Behind a proxy, every player may look like the same IP address, so adjust the rate limit.
+- The Dockerfile starts uvicorn with `--proxy-headers` and trusts `X-Forwarded-For` from any sender. That is what makes the per-IP rate limit see real visitors behind Railway's proxy. Do not expose the container directly to the internet without a proxy in front of it.
 - Keep `missions.json` and `.env` out of public reach.
 
 ## Known limitations
@@ -135,8 +176,9 @@ Never put the OpenAI key, answers or hints in frontend code. The full guide is i
 
 | Problem | Fix |
 |---|---|
-| Backend fails at startup about the API key | Check that `backend/.env` exists and that you started `uvicorn` from `backend/`. |
-| CORS error in the browser | Add the site's origin, with port, to `ALLOWED_ORIGINS` and restart. |
+| Backend fails at startup about the API key | Check that `ai_bot/backend/.env` exists (or `OPENAI_API_KEY` is set) and that you started `uvicorn` from `ai_bot/backend/`. |
+| CORS error in the browser | Add the site's origin, with scheme and port, to `ALLOWED_ORIGINS` and restart (or redeploy on Railway). |
+| Chat says "Failed to fetch" on the live site | `VITE_CHATBOT_API_URL` on the `web` service must be `https://<bot-domain>/api/bot`. It is a build argument, so redeploy `web` after changing it. |
 | `502` from `/api/bot/chat` | Check the backend logs: wrong model name, no credit, or a rejected setting. |
 | Error about `reasoning` or the web search tool | Set `REASONING_EFFORT = None` or `USE_WEB_SEARCH = False`. |
 | Bot often replies "the mist thickens" | A clue or `also_block` word is too common. Remove it from the clues or from `also_block`. |
