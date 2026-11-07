@@ -1,40 +1,38 @@
-
 # ARAD QUEST
 
-## Documentatia bazei de date
+## Database Documentation
 
-**Database:** arad_quest  
+**Database:** `arad_quest`  
 **DBMS:** PostgreSQL 17  
 **Extension:** PostGIS 3.6.2  
 **Language:** SQL
 
 ---
 
-## 1. Prezentarea proiectului
+## 1. Project Overview
 
-Arad Quest este o aplicatie interactiva de turism care permite utilizatorilor sa descopere obiective turistice din Arad, sa parcurga trasee tematice, sa rezolve misiuni, sa acumuleze puncte, sa obtina insigne si sa revendice recompense.
+Arad Quest is an interactive tourism application that allows users to discover tourist attractions in Arad, explore thematic routes, solve missions, collect points and badges, and claim rewards.
 
-Baza de date stocheaza informatii despre:
+The database stores information about:
 
-- Conturile si profilurile jucatorilor
-- Obiective turistice si coordonate GPS
-- Trasee tematice si ordinea obiectivelor
-- Misiuni, indicii si raspunsuri corecte
-- Progresul jucatorilor si raspunsurile trimise
-- Insigne disponibile si obtinute
-- Recompense disponibile si revendicate
+- Player accounts and profiles
+- Tourist attractions and GPS coordinates
+- Thematic routes and the order of their objectives
+- Missions, clues and accepted answers
+- Player progress and submitted answers
+- Available badges and earned badges
+- Available rewards and claimed rewards
+- QR codes used for reward redemption
 
-Baza de date contine 15 tabele functionale, organizate in patru categorii principale.
+The database contains 15 functional application tables, organized into four main categories.
 
----
+## 2. Database Structure
 
-## 2. Structura bazei de date
+### 2.1. Routes and Missions
 
-### 2.1. Trasee si misiuni
+This category manages thematic routes, tourist attractions and their associated missions.
 
-Aceasta categorie gestioneaza traseele tematice, obiectivele turistice si misiunile asociate.
-
-Tabele incluse:
+Tables:
 
 - `trasee_tematice`
 - `obiective_turistice`
@@ -43,62 +41,60 @@ Tabele incluse:
 - `indicii`
 - `raspunsuri_corecte`
 
-### 2.2. Jucatori si progres
+### 2.2. Players and Progress
 
-Aceasta categorie gestioneaza conturile jucatorilor, progresul in trasee si misiuni, precum si raspunsurile trimise.
+This category manages player accounts, route progress, mission progress and submitted answers.
 
-Tabele incluse:
+Tables:
 
 - `jucatori`
-- `progres_jucatori_misiuni`
 - `progres_jucatori_trasee`
+- `progres_jucatori_misiuni`
 - `raspunsuri_trimise`
 
-### 2.3. Recompense
+### 2.3. Rewards
 
-Aceasta categorie gestioneaza recompensele disponibile si revendicarile realizate de jucatori.
+This category manages available rewards and player reward claims.
 
-Tabele incluse:
+Tables:
 
 - `recompense_disponibile`
 - `recompense_revendicate`
 
-### 2.4. Insigne si clase
+### 2.4. Badges and Player Classes
 
-Aceasta categorie gestioneaza insignele disponibile, insignele obtinute de jucatori si clasele definite in aplicatie.
+This category manages available badges, earned badges and player classes.
 
-Tabele incluse:
+Tables:
 
 - `insigne_disponibile`
 - `insigne_jucatori`
 - `clase_jucatori`
 
----
+## 3. Database Tables
 
-## 3. Descrierea tabelelor
+### 3.1. `trasee_tematice`
 
-### 3.1. trasee_tematice
+Stores the thematic routes available in the application.
 
-Stocheaza traseele tematice disponibile in aplicatie.
+**Primary Key:** `route_id`
 
-**Primary Key:**
-- `route_id`
+Important columns:
 
-**Important columns:**
 - `title`
 - `description`
 - `difficulty`
 - `estimated_minutes`
 - `is_active`
 
-### 3.2. obiective_turistice
+### 3.2. `obiective_turistice`
 
-Stocheaza informatiile despre obiectivele turistice incluse in trasee.
+Stores tourist attractions and their geographical locations.
 
-**Primary Key:**
-- `objective_id`
+**Primary Key:** `objective_id`
 
-**Important columns:**
+Important columns:
+
 - `name`
 - `description`
 - `address`
@@ -107,86 +103,90 @@ Stocheaza informatiile despre obiectivele turistice incluse in trasee.
 - `radius_meters`
 - `is_active`
 
-Coloana `location` utilizeaza tipul PostGIS `GEOGRAPHY(POINT, 4326)` pentru stocarea coordonatelor GPS.
+The `location` column uses the PostGIS type `GEOGRAPHY(POINT, 4326)`.
 
-Coloana `image_url` permite stocarea adresei web a imaginii asociate obiectivului turistic.
+The `radius_meters` column defines the distance around an attraction within which a player can interact with the mission.
 
-Coloana `radius_meters` defineste raza de proximitate in metri in care jucatorul poate interactiona cu obiectivul.
+### 3.3. `ordine_obiective_traseu`
 
-### 3.3. ordine_obiective_traseu
-
-Realizeaza legatura dintre traseele tematice si obiectivele turistice si stabileste ordinea acestora.
+Connects thematic routes with tourist attractions and defines their order.
 
 **Composite Primary Key:**
+
 - `route_id`
 - `objective_id`
 
 **Foreign Keys:**
+
 - `route_id` -> `trasee_tematice.route_id`
 - `objective_id` -> `obiective_turistice.objective_id`
 
-**Important column:**
+Important column:
+
 - `sequence_number`
 
-Coloana `sequence_number` stabileste ordinea obiectivelor in cadrul unui traseu.
+### 3.4. `misiuni`
 
-### 3.4. misiuni
+Stores missions associated with tourist attractions.
 
-Stocheaza misiunile asociate obiectivelor turistice.
-
-**Primary Key:**
-- `mission_id`
+**Primary Key:** `mission_id`
 
 **Foreign Key:**
+
 - `objective_id` -> `obiective_turistice.objective_id`
 
-**Important columns:**
+Important columns:
+
 - `title`
 - `description`
 - `points_reward`
 - `is_active`
 
-Coloana `description` contine textul misiunii prezentate jucatorului.
+Each tourist attraction has an associated mission.
 
-### 3.5. indicii
+The current mission reward is 40 points per correctly completed mission.
 
-Stocheaza indiciile asociate misiunilor.
+### 3.5. `indicii`
 
-**Primary Key:**
-- `clue_id`
+Stores clues associated with missions.
+
+**Primary Key:** `clue_id`
 
 **Foreign Key:**
+
 - `mission_id` -> `misiuni.mission_id`
 
-**Important columns:**
+Important columns:
+
 - `clue_text`
 - `clue_order`
 
-Coloana `clue_order` stabileste ordinea in care sunt afisate indiciile.
+The `clue_order` column determines the order in which clues are presented to the player.
 
-### 3.6. raspunsuri_corecte
+### 3.6. `raspunsuri_corecte`
 
-Stocheaza raspunsurile acceptate pentru fiecare misiune.
+Stores accepted answers for missions.
 
-**Primary Key:**
-- `solution_id`
+**Primary Key:** `solution_id`
 
 **Foreign Key:**
+
 - `mission_id` -> `misiuni.mission_id`
 
-**Important column:**
+Important column:
+
 - `accepted_answer`
 
-Raspunsurile acceptate trebuie validate in backend si nu trebuie expuse direct in frontend.
+Accepted answers must be validated by the backend and must never be exposed directly to the frontend.
 
-### 3.7. jucatori
+### 3.7. `jucatori`
 
-Stocheaza conturile jucatorilor si informatiile profilurilor acestora.
+Stores player accounts and profile information.
 
-**Primary Key:**
-- `player_id`
+**Primary Key:** `player_id`
 
-**Important columns:**
+Important columns:
+
 - `username`
 - `email`
 - `password_hash`
@@ -194,141 +194,170 @@ Stocheaza conturile jucatorilor si informatiile profilurilor acestora.
 - `created_at`
 - `avatar_id`
 
-Coloana `avatar_id` identifica avatarul selectat de jucator. Aceasta are o constrangere CHECK care permite valorile de la 1 la 4.
+The `avatar_id` column identifies the avatar selected by the player. Its CHECK constraint allows values from 1 to 4.
 
-Tabelul `jucatori` nu contine coloana `class_id` si nu are in prezent o relatie directa cu tabelul `clase_jucatori`.
+The `total_points` column stores the player's accumulated points. New players should start with 0 points, using a database default value of 0.
 
-Parolele nu trebuie stocate niciodata in format text simplu. Backend-ul trebuie sa genereze si sa verifice hash-urile parolelor folosind un algoritm securizat, precum Argon2id sau bcrypt.
+Passwords must never be stored in plain text. The backend must generate and verify password hashes using a secure algorithm such as Argon2id or bcrypt.
 
-### 3.8. progres_jucatori_trasee
+### 3.8. `progres_jucatori_trasee`
 
-Stocheaza progresul jucatorilor in cadrul traseelor tematice.
+Stores player progress on thematic routes.
 
 **Composite Primary Key:**
+
 - `player_id`
 - `route_id`
 
 **Foreign Keys:**
+
 - `player_id` -> `jucatori.player_id`
 - `route_id` -> `trasee_tematice.route_id`
 
-**Important columns:**
+Important columns:
+
 - `status`
 - `started_at`
 - `completed_at`
 
-### 3.9. progres_jucatori_misiuni
+### 3.9. `progres_jucatori_misiuni`
 
-Stocheaza progresul jucatorilor pentru fiecare misiune.
+Stores player progress for individual missions.
 
 **Composite Primary Key:**
+
 - `player_id`
 - `mission_id`
 
 **Foreign Keys:**
+
 - `player_id` -> `jucatori.player_id`
 - `mission_id` -> `misiuni.mission_id`
 
-**Important columns:**
+Important columns:
+
 - `status`
 - `started_at`
 - `completed_at`
 - `points_awarded`
 
-### 3.10. raspunsuri_trimise
+The `points_awarded` column records the points awarded to the player for completing a mission.
 
-Stocheaza raspunsurile trimise de jucatori pentru misiuni.
+### 3.10. `raspunsuri_trimise`
 
-**Primary Key:**
-- `attempt_id`
+Stores answers submitted by players.
+
+**Primary Key:** `attempt_id`
 
 **Composite Foreign Key:**
+
 - `(player_id, mission_id)` -> `progres_jucatori_misiuni(player_id, mission_id)`
 
-**Important columns:**
+Important columns:
+
 - `answer_text`
 - `is_correct`
 - `submitted_at`
 
-Tabelul permite pastrarea istoricului incercarilor si verificarea raspunsurilor trimise.
+This table maintains the history of submitted answers and their validation results.
 
-### 3.11. recompense_disponibile
+### 3.11. `recompense_disponibile`
 
-Stocheaza recompensele care pot fi revendicate de jucatori.
+Stores the rewards that players can claim.
 
-**Primary Key:**
-- `reward_id`
+**Primary Key:** `reward_id`
 
-**Important columns:**
+Important columns:
+
 - `name`
 - `description`
 - `points_cost`
 - `quantity_available`
 - `is_active`
 
-Coloana `quantity_available` reprezinta cantitatea disponibila. Valoarea NULL poate reprezenta un stoc nelimitat.
+The `quantity_available` column represents the available stock. A NULL value can represent unlimited stock.
 
-### 3.12. recompense_revendicate
+### 3.12. `recompense_revendicate`
 
-Stocheaza recompensele revendicate de jucatori.
+Stores rewards claimed by players.
 
-**Primary Key:**
-- `claim_id`
+**Primary Key:** `claim_id`
 
 **Foreign Keys:**
+
 - `player_id` -> `jucatori.player_id`
 - `reward_id` -> `recompense_disponibile.reward_id`
 
-**Important columns:**
+Important columns:
+
 - `points_spent`
 - `claimed_at`
+- `qr_code`
+- `status`
+- `redeemed_at`
 
-### 3.13. insigne_disponibile
+The QR code is generated for a reward claim and is used to identify the claim during redemption.
 
-Stocheaza insignele care pot fi obtinute in aplicatie.
+The `qr_code` column must contain a unique token.
 
-**Primary Key:**
-- `badge_id`
+The `status` column represents the redemption state:
 
-### 3.14. insigne_jucatori
+- `pending` - the reward has been claimed but not yet redeemed.
+- `redeemed` - the reward has been successfully redeemed.
+- `expired` - the reward is no longer valid.
 
-Realizeaza legatura dintre jucatori si insignele obtinute de acestia.
+The `redeemed_at` column stores the date and time when the reward was redeemed.
+
+A QR code must be valid for a single redemption only.
+
+### 3.13. `insigne_disponibile`
+
+Stores the badges available in the application.
+
+**Primary Key:** `badge_id`
+
+The table defines the badges that players can earn.
+
+### 3.14. `insigne_jucatori`
+
+Connects players with the badges they have earned.
 
 **Composite Primary Key:**
+
 - `player_id`
 - `badge_id`
 
 **Foreign Keys:**
+
 - `player_id` -> `jucatori.player_id`
 - `badge_id` -> `insigne_disponibile.badge_id`
 
-### 3.15. clase_jucatori
+### 3.15. `clase_jucatori`
 
-Stocheaza clasele definite pentru jucatori.
+Stores the player classes defined in the application.
 
-**Primary Key:**
-- `class_id`
+**Primary Key:** `class_id`
 
-**Important columns:**
+Important columns:
+
 - `class_name`
 - `description`
 
-Tabelul exista in structura bazei de date, dar nu are in prezent o relatie directa cu tabelul `jucatori`.
+The table currently exists independently and has no direct relationship with `jucatori`.
 
----
+## 4. Thematic Routes
 
-## 4. Traseele tematice existente
-
-In baza de date sunt definite doua trasee tematice, care contin in total 11 obiective turistice si 11 misiuni.
+The database currently defines two thematic routes, containing 11 tourist attractions and 11 associated missions.
 
 ### 4.1. Descopera Aradul
 
 **Route ID:** 1  
-**Numar obiective:** 6  
-**Punctaj total:** 130 puncte
+**Number of objectives:** 6  
+**Number of missions:** 6  
+**Potential mission points:** 240
 
-| Ordine | Obiectiv | Objective ID | Mission ID |
-|---|---|---:|---:|
+| Order | Tourist attraction | Objective ID | Mission ID |
+|---:|---|---:|---:|
 | 1 | Primaria Arad | 1 | 1 |
 | 2 | Biserica Rosie | 3 | 3 |
 | 3 | Colegiul National Moise Nicoara | 7 | 4 |
@@ -339,99 +368,91 @@ In baza de date sunt definite doua trasee tematice, care contin in total 11 obie
 ### 4.2. Traseul in natura
 
 **Route ID:** 3  
-**Numar obiective:** 5  
-**Punctaj total:** 100 puncte
+**Number of objectives:** 5  
+**Number of missions:** 5  
+**Potential mission points:** 200
 
-| Ordine | Obiectiv | Objective ID | Mission ID |
-|---|---|---:|---:|
+| Order | Tourist attraction | Objective ID | Mission ID |
+|---:|---|---:|---:|
 | 1 | Parcul Micalaca - Zona 300 | 10 | 7 |
 | 2 | Parcul Europa | 11 | 8 |
 | 3 | Parcul de la Podgoria | 12 | 9 |
 | 4 | Parcul Copiilor | 13 | 10 |
 | 5 | Faleza Muresului - zona Gloria | 14 | 11 |
 
-Fiecare obiectiv turistic are o misiune asociata, cu un raspuns care trebuie validat de backend.
+Each tourist attraction has an associated mission with an accepted answer validated by the backend.
 
-Ordinea obiectivelor este definita in tabelul `ordine_obiective_traseu` prin intermediul coloanei `sequence_number`.
+The order of attractions is stored in `ordine_obiective_traseu` through the `sequence_number` column.
 
-Generarea unei ordini aleatorii individuale pentru fiecare jucator reprezinta o functionalitate propusa pentru o etapa ulterioara de dezvoltare. Aceasta nu este inca implementata in baza de date.
+The maximum potential score is calculated from the mission rewards. Each of the 11 missions currently awards 40 points.
 
----
+## 5. Relationships Between Tables
 
-## 5. Relatiile dintre tabele
-
-### Relatii de tip unu-la-mai-multi (1:N)
+### One-to-Many Relationships (1:N)
 
 - `obiective_turistice` -> `misiuni`
 - `misiuni` -> `indicii`
 - `misiuni` -> `raspunsuri_corecte`
 
-### Relatii de tip multi-la-multi (M:N)
+### Many-to-Many Relationships (M:N)
 
-- `trasee_tematice` <-> `obiective_turistice`, prin intermediul tabelului `ordine_obiective_traseu`.
-- `jucatori` <-> `trasee_tematice`, prin intermediul tabelului `progres_jucatori_trasee`.
-- `jucatori` <-> `misiuni`, prin intermediul tabelului `progres_jucatori_misiuni`.
-- `jucatori` <-> `insigne_disponibile`, prin intermediul tabelului `insigne_jucatori`.
+- `trasee_tematice` <-> `obiective_turistice`, through `ordine_obiective_traseu`.
+- `jucatori` <-> `trasee_tematice`, through `progres_jucatori_trasee`.
+- `jucatori` <-> `misiuni`, through `progres_jucatori_misiuni`.
+- `jucatori` <-> `insigne_disponibile`, through `insigne_jucatori`.
 
-### Alte relatii
+### Other Relationships
 
 - `progres_jucatori_misiuni` -> `raspunsuri_trimise`
 - `jucatori` -> `recompense_revendicate`
 - `recompense_disponibile` -> `recompense_revendicate`
 
-Tabelul `clase_jucatori` nu are in prezent o relatie directa cu `jucatori`.
+The `clase_jucatori` table currently has no direct relationship with `jucatori`.
 
----
+## 6. Primary Keys, Foreign Keys and Constraints
 
-## 6. Chei primare, chei externe si constrangeri
+The database uses:
 
-O cheie primara (PK - Primary Key) identifica in mod unic fiecare inregistrare dintr-un tabel.
+- Primary keys
+- Composite primary keys
+- Foreign keys
+- UNIQUE constraints
+- CHECK constraints
+- NOT NULL constraints
 
-O cheie externa (FK - Foreign Key) stabileste o relatie intre tabele, facand referire la o cheie primara sau la o cheie unica dintr-un alt tabel.
+### 6.1. UNIQUE Constraints
 
-Baza de date utilizeaza:
+The database includes uniqueness rules for:
 
-- Chei primare simple.
-- Chei primare compuse.
-- Chei externe.
-- Constrangeri UNIQUE.
-- Constrangeri CHECK.
-- Constrangeri NOT NULL.
+- `clase_jucatori.class_name`
+- `jucatori.username`
+- `jucatori.email`
+- `indicii(mission_id, clue_order)`
+- `insigne_disponibile.name`
+- `ordine_obiective_traseu(route_id, sequence_number)`
+- `recompense_revendicate.qr_code`
 
-Cheile primare compuse sunt utilizate atunci cand o inregistrare este identificata prin combinatia a doua coloane, de exemplu `player_id` si `mission_id`.
+### 6.2. CHECK Constraints
 
-### 6.1. Constrangeri UNIQUE
-
-Au fost verificate urmatoarele reguli de unicitate:
-
-| Tabel | Coloane | Rol |
-|---|---|---|
-| `clase_jucatori` | `class_name` | Numele claselor trebuie sa fie unice. |
-| `jucatori` | `username` | Fiecare nume de utilizator trebuie sa fie unic. |
-| `jucatori` | `email` | Fiecare adresa de email trebuie sa fie unica. |
-| `indicii` | `(mission_id, clue_order)` | Ordinea indiciilor trebuie sa fie unica in cadrul fiecarei misiuni. |
-| `insigne_disponibile` | `name` | Numele insignelor trebuie sa fie unice. |
-| `ordine_obiective_traseu` | `(route_id, sequence_number)` | Fiecare pozitie dintr-un traseu poate fi ocupata de un singur obiectiv. |
-
-### 6.2. Constrangeri CHECK
-
-Baza de date contine reguli de validare pentru urmatoarele valori:
+The database includes validation rules for:
 
 - `jucatori.total_points >= 0`
-- `jucatori.avatar_id` trebuie sa fie intre 1 si 4.
+- `jucatori.avatar_id` between 1 and 4
 - `misiuni.points_reward >= 0`
 - `progres_jucatori_misiuni.points_awarded >= 0`
-- `progres_jucatori_misiuni.status` poate avea doar valorile `in_progress` sau `completed`.
-- O misiune cu statusul `completed` trebuie sa aiba completata coloana `completed_at`.
-- `progres_jucatori_trasee.status` poate avea doar valorile `in_progress` sau `completed`.
+- `progres_jucatori_misiuni.status` limited to `in_progress` or `completed`
+- Completed mission progress must have a non-NULL `completed_at`
+- `progres_jucatori_trasee.status` limited to `in_progress` or `completed`
 - `recompense_disponibile.points_cost >= 0`
-- `recompense_disponibile.quantity_available` poate fi NULL sau o valoare mai mare ori egala cu 0.
+- `recompense_disponibile.quantity_available` must be NULL or greater than or equal to 0
 - `recompense_revendicate.points_spent >= 0`
-- `trasee_tematice.difficulty` poate avea doar valorile `easy`, `medium` sau `hard`.
+- `trasee_tematice.difficulty` limited to `easy`, `medium` or `hard`
 
-### 6.3. Coloane obligatorii (NOT NULL)
+The reward claim status should be restricted to `pending`, `redeemed` or `expired`.
 
-Au fost verificate coloanele obligatorii ale tabelelor. Printre acestea se numara:
+### 6.3. Required Columns (NOT NULL)
+
+Required columns include:
 
 - `jucatori`: `total_points`, `created_at`, `avatar_id`
 - `misiuni`: `objective_id`, `title`, `points_reward`, `is_active`
@@ -441,160 +462,176 @@ Au fost verificate coloanele obligatorii ale tabelelor. Printre acestea se numar
 - `progres_jucatori_trasee`: `status`, `started_at`
 - `raspunsuri_trimise`: `submitted_at`
 - `recompense_disponibile`: `name`, `points_cost`, `is_active`
-- `recompense_revendicate`: `claimed_at`
+- `recompense_revendicate`: `claimed_at`, `status`
 
-Coloanele optionale, precum descrierile, imaginile, adresele, `completed_at` si `quantity_available`, pot accepta valori NULL conform structurii proiectate.
+Optional columns may accept NULL values according to their table definitions.
 
----
+## 7. PostGIS and GPS Coordinates
 
-## 7. PostGIS si coordonatele GPS
+PostGIS is a PostgreSQL extension used to store and process geographical information.
 
-PostGIS este o extensie PostgreSQL utilizata pentru stocarea si prelucrarea informatiilor geografice.
-
-Tabelul `obiective_turistice` contine coloana:
+The `obiective_turistice` table contains:
 
 `location GEOGRAPHY(POINT, 4326)`
 
-Aceasta coloana stocheaza pozitia geografica a fiecarui obiectiv turistic.
+This column stores the geographical position of each tourist attraction.
 
-Sistemul de referinta spatiala utilizat este SRID 4326 (WGS 84).
+The spatial reference system is SRID 4326 (WGS 84).
 
-Coordonatele pot fi extrase folosind:
+Coordinates can be extracted using:
 
-- `ST_X()` pentru longitudine.
-- `ST_Y()` pentru latitudine.
+- `ST_X()` for longitude.
+- `ST_Y()` for latitude.
 
-La introducerea coordonatelor se utilizeaza functia:
+Coordinates must be inserted using:
 
 `ST_SetSRID(ST_MakePoint(longitude, latitude), 4326)::geography`
 
-Este important ca longitudinea sa fie transmisa prima, urmata de latitudine.
+Longitude must be supplied first, followed by latitude.
 
-Coloana `radius_meters` defineste distanta din jurul unui obiectiv turistic in care poate fi declansata o interactiune bazata pe locatie.
+The `radius_meters` column defines the permitted distance around an attraction for location-based interactions.
 
-Pentru cele 11 obiective din cele doua trasee, raza configurata in baza de date este de 50 de metri.
+The configured radius for the 11 tourist attractions is 50 meters.
 
-Backend-ul trebuie sa verifice daca pozitia GPS a jucatorului se incadreaza in raza obiectivului inainte de a permite verificarea raspunsului la misiune.
+The backend must verify whether the player's GPS position is within the configured radius before validating the mission answer.
 
-Coordonatele GPS trebuie verificate inainte de utilizarea aplicatiei in conditii reale.
+GPS coordinates must be verified before the application is used in production.
 
----
+## 8. Backend Implementation Rules
 
-## 8. Observatii pentru implementarea backend-ului
+The Python backend communicates with PostgreSQL and uses SQL queries to retrieve and modify application data.
 
-Backend-ul dezvoltat in Python comunica cu PostgreSQL si utilizeaza interogari SQL pentru citirea si modificarea datelor aplicatiei.
+Important implementation rules:
 
-Reguli importante pentru implementare:
+1. Passwords must be hashed using Argon2id or bcrypt.
+2. Passwords must never be stored in plain text.
+3. Accepted mission answers must be validated in the backend.
+4. Accepted answers must never be exposed to the frontend.
+5. GPS distance must be validated before checking the submitted answer.
+6. Mission points must be awarded only once for each completed mission.
+7. Mission completion and point updates must use database transactions.
+8. Reward claims must verify that the player has sufficient points and that the reward is available.
+9. Reward claims must update the player's points and reward stock within a single transaction.
+10. User input must be passed through parameterized SQL queries.
+11. GPS coordinates must use the correct order: longitude followed by latitude.
+12. The GPS radius must be read from `radius_meters`, rather than duplicated as a hardcoded value in the backend.
+13. QR tokens must be generated securely by the backend.
+14. QR redemption must be validated by the backend.
+15. A reward claim must be redeemable only once.
+16. Reward redemption must update the claim status and redemption timestamp atomically.
 
-1. Parolele trebuie transformate in hash folosind Argon2id sau bcrypt.
-2. Parolele nu trebuie stocate niciodata in format text simplu.
-3. Raspunsurile la misiuni trebuie validate in backend.
-4. Raspunsurile corecte nu trebuie transmise catre frontend.
-5. Verificarea distantei GPS trebuie realizata inainte de verificarea raspunsului.
-6. Punctele trebuie acordate o singura data pentru finalizarea unei misiuni.
-7. Finalizarea misiunilor si actualizarea punctelor trebuie realizate folosind tranzactii.
-8. La revendicarea recompenselor trebuie verificat daca jucatorul are suficiente puncte si daca recompensa mai este disponibila.
-9. Revendicarea unei recompense trebuie sa actualizeze punctele jucatorului si cantitatea disponibila intr-o singura tranzactie.
-10. Datele introduse de utilizatori trebuie transmise prin interogari SQL parametrizate.
-11. Coordonatele GPS trebuie transmise in ordinea corecta: longitudine si latitudine atunci cand sunt utilizate in `ST_MakePoint(longitude, latitude)`.
-12. Raza GPS trebuie citita din coloana `radius_meters`, nu definita separat printr-o valoare fixa in backend.
+## 9. QR Reward Redemption Workflow
 
----
+The reward redemption process uses the `recompense_revendicate` table.
 
-## 9. Datele existente in baza de date
+The expected workflow is:
 
-In urma introducerii celor doua trasee, baza de date contine:
+1. The player selects an available reward.
+2. The backend checks the player's available points.
+3. The backend checks the reward stock.
+4. The backend creates a reward claim.
+5. A unique QR token is generated and stored in `qr_code`.
+6. The claim receives the initial status `pending`.
+7. The frontend displays the QR code to the player.
+8. An authorized administrator scans the QR code.
+9. The backend validates the token and checks that the status is `pending`.
+10. The backend changes the status to `redeemed` and records `redeemed_at`.
 
-| Element | Numar |
+A redeemed QR code must not be accepted again.
+
+The backend must perform reward claiming and redemption using transactions to prevent duplicate claims, incorrect point deductions or multiple redemptions.
+
+## 10. Current Database Data
+
+The database currently contains:
+
+| Element | Count |
 |---|---:|
-| Trasee tematice | 2 |
-| Obiective turistice incluse in trasee | 11 |
-| Misiuni asociate obiectivelor | 11 |
-| Obiective in traseul Descopera Aradul | 6 |
-| Obiective in Traseul in natura | 5 |
-| Punctaj total Descopera Aradul | 130 |
-| Punctaj total Traseul in natura | 100 |
+| Functional application tables | 15 |
+| Thematic routes | 2 |
+| Tourist attractions | 11 |
+| Associated missions | 11 |
+| Objectives in Descopera Aradul | 6 |
+| Objectives in Traseul in natura | 5 |
+| Points per mission | 40 |
+| Maximum points in Descopera Aradul | 240 |
+| Maximum points in Traseul in natura | 200 |
+| Maximum points across both routes | 440 |
 
-Datele pentru cele doua trasee sunt stocate in tabelele `trasee_tematice`, `obiective_turistice`, `ordine_obiective_traseu`, `misiuni` si `raspunsuri_corecte`.
+The database also contains data for testing player accounts, progress, badges and rewards.
 
-Baza de date mai contine date utilizate pentru testarea conturilor, progresului, insignelor si recompenselor.
+Demonstration data is intended for development and testing.
 
----
+## 11. SQL Test Queries
 
-## 10. Interogari SQL de testare
+The file `03_test_queries.sql` contains queries used to verify database functionality.
 
-Fisierul `03_test_queries.sql` contine interogari utilizate pentru verificarea functionalitatilor bazei de date.
+These queries cover:
 
-Acestea permit verificarea urmatoarelor informatii:
+- Player profiles
+- Tourist attractions and GPS coordinates
+- Thematic routes
+- Missions and clues
+- Player progress
+- Earned badges
+- Available rewards
+- Reward claims and QR status
+- Player leaderboard
+- Submitted answer history
 
-- Afisarea profilurilor jucatorilor.
-- Afisarea obiectivelor turistice si a coordonatelor GPS.
-- Afisarea traseelor tematice.
-- Afisarea misiunilor si a indiciilor.
-- Verificarea progresului jucatorilor.
-- Afisarea insignelor obtinute.
-- Afisarea recompenselor disponibile.
-- Generarea clasamentului jucatorilor.
-- Afisarea istoricului raspunsurilor trimise.
+## 12. Database Files
 
-Interogarile sunt utilizate pentru testarea structurii si a datelor din baza de date.
+The `database` directory contains:
 
----
+- `01_create_tables.sql` - creates the database tables, relationships and constraints.
+- `02_insert_data.sql` - inserts initial application and demonstration data.
+- `03_test_queries.sql` - contains SQL queries used to test the database.
+- `04_database_documentation.md` - documents the database structure and implementation rules.
+- `05_user_settings.sql` - contains user settings-related database changes, if applicable.
 
-## 11. Fisierele bazei de date
+## 13. Database Validation
 
-Directorul `database` contine urmatoarele fisiere:
+The database structure should be validated after creation or restoration.
 
-- `01_create_tables.sql` - scriptul pentru crearea tabelelor.
-- `02_insert_data.sql` - scriptul pentru inserarea datelor initiale.
-- `03_test_queries.sql` - interogarile utilizate pentru testarea bazei de date.
-- `04_database_documentation.md` - documentatia structurii bazei de date.
-- `05_insert_nature_route.sql` - scriptul pentru introducerea traseului in natura, daca este pastrat separat in repository.
-- `Arad_Quest_Database_Map_ro.html` - reprezentarea vizuala a structurii bazei de date.
+Validation includes:
 
----
+- Confirming the existence of all 15 functional application tables.
+- Checking primary and foreign keys.
+- Checking table relationships.
+- Checking UNIQUE constraints.
+- Checking CHECK constraints.
+- Checking NOT NULL requirements.
+- Checking the PostGIS extension.
+- Checking the geographical type of `location`.
+- Checking the configured GPS radius.
+- Checking the two thematic routes and their associated missions.
+- Checking the reward QR columns and status values.
+- Checking the default value for `jucatori.total_points`.
 
-## 12. Verificarea structurii bazei de date
+The `spatial_ref_sys` table is created and managed by PostGIS. It is an extension system table and is not included in the 15 functional application tables.
 
-Structura bazei de date a fost verificata in PostgreSQL prin inspectarea tabelelor, coloanelor si constrangerilor.
+## 14. Future Development
 
-Verificarile au inclus:
+The following features require further implementation or integration:
 
-- Existenta celor 15 tabele functionale.
-- Verificarea cheilor primare si externe.
-- Verificarea relatiilor dintre tabele.
-- Verificarea constrangerilor UNIQUE.
-- Verificarea constrangerilor CHECK.
-- Verificarea coloanelor obligatorii NOT NULL.
-- Verificarea tipului geografic al coloanei `location`.
-- Verificarea razei GPS configurate pentru obiectivele turistice.
-- Verificarea datelor introduse pentru cele doua trasee.
+- Individual player progress management.
+- Sequential unlocking of objectives after mission completion.
+- Randomized objective order for each player.
+- Persisting the generated order when a player returns to the application.
+- QR-based reward redemption integration.
+- Management of images associated with tourist attractions.
+- Administrative reward redemption interface.
 
-Tabelul `spatial_ref_sys` este creat si gestionat de extensia PostGIS. Acesta este un tabel tehnic al extensiei si nu face parte din cele 15 tabele functionale ale aplicatiei.
+These features require coordination between the database, backend and frontend.
 
----
+## 15. Conclusion
 
-## 13. Functionalitati aflate in dezvoltare
+The Arad Quest database is designed to manage thematic routes, tourist attractions, missions, players, progress, badges and rewards.
 
-Urmatoarele functionalitati necesita implementare sau integrare suplimentara in aplicatie:
+PostgreSQL provides relational data storage and management, while PostGIS enables geographical functionality based on GPS coordinates.
 
-- Gestionarea progresului individual al jucatorilor.
-- Deblocarea succesiva a obiectivelor dupa rezolvarea misiunilor.
-- Generarea si salvarea unei ordini aleatorii a obiectivelor pentru fiecare jucator.
-- Pastrarea aceleiasi ordini atunci cand jucatorul revine in aplicatie.
-- Gestionarea revendicarii recompenselor prin coduri QR.
-- Gestionarea imaginilor asociate obiectivelor turistice.
+The current database structure includes 15 functional application tables, two thematic routes, 11 tourist attractions and 11 associated missions.
 
-Aceste functionalitati trebuie implementate prin colaborarea dintre baza de date, backend si frontend.
+The reward management structure also supports QR-based redemption with unique tokens and redemption statuses.
 
----
-
-## 14. Concluzie
-
-Baza de date Arad Quest este organizata pentru gestionarea traseelor tematice, obiectivelor turistice, misiunilor, jucatorilor, progresului, insignelor si recompenselor.
-
-PostgreSQL asigura stocarea si gestionarea datelor, iar extensia PostGIS permite utilizarea coordonatelor geografice pentru functionalitatile bazate pe locatie.
-
-Structura actuala include doua trasee tematice si 11 obiective turistice, fiecare avand o misiune asociata.
-
-Baza de date reprezinta componenta centrala pentru gestionarea informatiilor si a progresului utilizatorilor in aplicatia Arad Quest.
+The database is the central data component of the Arad Quest application.
