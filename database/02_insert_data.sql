@@ -18,6 +18,7 @@ VALUES
 ('Champion', 'Participa la provocari si acumuleaza puncte'),
 ('Pathfinder', 'Descopera trasee noi');
 
+
 -- ==========================================
 -- 2. OBIECTIVE TURISTICE
 -- ==========================================
@@ -26,7 +27,7 @@ INSERT INTO obiective_turistice
 (name, description, address, image_url, location, radius_meters)
 VALUES
 
--- TRaseul cultural
+-- Traseul cultural
 
 (
     'Primaria Arad',
@@ -77,7 +78,7 @@ VALUES
     50
 ),
 
--- TRaseul in natura
+-- Traseul in natura
 
 (
     'Parcul Micalaca - Zona 300',
@@ -120,6 +121,7 @@ VALUES
     50
 );
 
+
 -- ==========================================
 -- 3. TRASEE TEMATICE
 -- ==========================================
@@ -139,6 +141,7 @@ VALUES
     'easy',
     60
 );
+
 
 -- ==========================================
 -- 4. ORDINEA OBIECTIVELOR IN TRASEE
@@ -166,6 +169,7 @@ JOIN trasee_tematice t
 JOIN obiective_turistice o
     ON o.name = v.objective_name;
 
+
 -- Traseul in natura
 
 INSERT INTO ordine_obiective_traseu
@@ -187,6 +191,7 @@ JOIN trasee_tematice t
 JOIN obiective_turistice o
     ON o.name = v.objective_name;
 
+
 -- ==========================================
 -- 5. MISIUNI
 -- ==========================================
@@ -207,37 +212,37 @@ FROM (
         'Primaria Arad',
         'Mesajul de la intrare',
         'Deasupra intrarii principale sta scris un citat celebru. Carei evanghelii ii apartine?',
-        20
+        40
     ),
     (
         'Teatrul Clasic Ioan Slavici',
         'Poetul din umbra scenei',
         'Nu toti cei care au trecut pragul acestui loc au venit sa joace. Unul a locuit aici, dar scena lui a fost poezia. Cauta-i urma pe zid si descopera-i identitatea. Cate silabe contine cuvantul ce formeaza judetul in care acesta s-a nascut?',
-        30
+        40
     ),
     (
         'Biserica Rosie',
         'In jurul zidurilor',
         'Nu te multumi sa o privesti din fata. Cladirea isi dezvaluie secretele si celor care o inconjoara. Fa un tur complet si numara toate portile integrate in zidurile exterioare. Cate ai descoperit?',
-        20
+        40
     ),
     (
         'Colegiul National Moise Nicoara',
         'Doua destine, un numar',
         'In fata scolii, observa cele doua siluete de bronz care stau de straja, cate una de fiecare parte a intrarii. Moise Nicoara si Ioan Slavici au trait amandoi 77 de ani. Care numar leaga matematic destinele celor doi paznici?',
-        20
+        40
     ),
     (
         'Filarmonica',
         'Semnul ascuns in parc',
         'Uita-te in jurul cladirii. Nu este nici drum, nici calator, dar sta pe cinci linii paralele si stabileste regulile de la bun inceput. Se infasoara exact pe a doua linie. Cum se numeste?',
-        20
+        40
     ),
     (
         'Vechiul Cazinou',
         'Trei urme ale timpului',
         'Trei repere au fost lasate in urma de timp si sunt scrise intr-un alfabet in care semnele se aduna pentru a deveni numere. Priveste-le in ordinea coborarii, nu in ordinea anilor. Unul dintre ele marcheaza inceputul acestei cladiri. Nu te intreb ce an este, ci unde se afla in sirul celor trei.',
-        20
+        40
     ),
 
     -- Traseul in natura
@@ -246,36 +251,37 @@ FROM (
         'Parcul Micalaca - Zona 300',
         'Gustul unei iesiri in aer liber',
         'Nu doar plimbarile si sportul te asteapta aici. Parcul a fost amenajat si pentru cei care prefera sa petreaca timp in aer liber, la un gratar cu prietenii. Cate locuri pentru gratar au fost prevazute in parc?',
-        20
+        40
     ),
     (
         'Parcul Europa',
         'Adaposturi printre copaci',
         'Natura nu tine intotdeauna cont de planurile noastre, iar uneori ploaia ne poate surprinde in mijlocul unei plimbari. Cate casute colorate gasesti aici, pregatite sa te adaposteasca?',
-        20
+        40
     ),
     (
         'Parcul de la Podgoria',
         'Chipul unei personalitati',
         'Printre copaci si in apropierea apei, o statuie pastreaza amintirea unui om care a marcat istoria recenta a Romaniei. Care este numele personalitatii reprezentate?',
-        20
+        40
     ),
     (
         'Parcul Copiilor',
         'Drumul spre iesire',
         'Exista un loc in care te poti rataci printre drumuri intortocheate, dar unde rabdarea si atentia te ajuta sa gasesti iesirea. Cum se numeste?',
-        20
+        40
     ),
     (
         'Faleza Muresului - zona Gloria (Tenis Club Pro)',
         'Jocul de pe faleza',
         'Nu departe de faleza, fileul imparte terenul in doua, iar mingea trece dintr-o parte in alta. Priveste cu atentie terenurile de la Tenis Club Pro. Cate terenuri de tenis sunt aici?',
-        20
+        40
     )
 
 ) AS v(objective_name, mission_title, mission_description, points_reward)
 JOIN obiective_turistice o
     ON o.name = v.objective_name;
+
 
 -- ==========================================
 -- 6. INDICII
@@ -300,6 +306,7 @@ FROM (
 ) AS v(mission_title, clue_text, clue_order)
 JOIN misiuni m
     ON m.title = v.mission_title;
+
 
 -- ==========================================
 -- 7. RASPUNSURI CORECTE ACCEPTATE
@@ -327,6 +334,7 @@ FROM (
 JOIN misiuni m
     ON m.title = v.mission_title;
 
+
 -- ==========================================
 -- 8. INSIGNE DISPONIBILE
 -- ==========================================
@@ -338,6 +346,7 @@ VALUES
 ('Explorator', 'Pentru acumularea a 50 de puncte.', 50),
 ('Detectiv', 'Pentru rezolvarea mai multor indicii.', 100);
 
+
 -- ==========================================
 -- 9. RECOMPENSE DISPONIBILE
 -- ==========================================
@@ -347,6 +356,7 @@ INSERT INTO recompense_disponibile
 VALUES
 ('Reducere simbolica', 'O reducere oferita ca recompensa.', 50, 10),
 ('Premiu special', 'Un premiu pentru jucatorii activi.', 100, 5);
+
 
 -- ==========================================
 -- SFARSITUL INSERARII DATELOR
