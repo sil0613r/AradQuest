@@ -55,6 +55,15 @@ For each of `api`, `web`, and `bot`:
 1. **New → GitHub Repo** (or **Empty Service**) and select this repository and branch `dev-deployment`.
 2. **Settings → Source → Root Directory**: set the value from the table above.
 3. Railway detects the Dockerfile in that directory. Leave the builder on **Dockerfile**.
+4. **Watch Paths** (in the service's build settings; the menu name can vary by Railway version). Set one value per service so a push only redeploys what changed:
+
+| Service | Watch Paths |
+|---|---|
+| `api` | `/api/**` |
+| `web` | `/frontend/**` |
+| `bot` | `/ai_bot/backend/**` |
+
+5. Turn on **Wait for CI** if the option is shown, so Railway waits for the GitHub checks before deploying.
 
 ## 4. Generate the public domains
 
